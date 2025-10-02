@@ -1,0 +1,461 @@
+package godateparser
+
+import (
+	"fmt"
+	"regexp"
+	"strconv"
+	"strings"
+	"time"
+
+	"github.com/coredds/GoDateParser/translations"
+)
+
+// Time parsing patterns for v1.0.0 Phase 3B
+// Supports: 12-hour format, 24-hour format, with/without seconds
+
+// timePattern represents a time-only parsing pattern
+type timePattern struct {
+	regex  *regexp.Regexp
+	parser func(*parserContext, []string) (time.Time, error)
+}
+
+// Time patterns (ordered by specificity)
+var timePatterns = []*timePattern{
+	// 12-hour format with AM/PM
+	// Examples: 3:30 PM, 9:15 AM, 11:45:30 PM
+	{
+		regex: regexp.MustCompile(`(?i)^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)$`),
+		parser: func(ctx *parserContext, matches []string) (time.Time, error) {
+			hour, _ := strconv.Atoi(matches[1])
+			minute, _ := strconv.Atoi(matches[2])
+			second := 0
+			if matches[3] != "" {
+				second, _ = strconv.Atoi(matches[3])
+			}
+			period := strings.ToUpper(matches[4])
+
+			// Convert to 24-hour format
+			if period == "PM" && hour != 12 {
+				hour += 12
+			} else if period == "AM" && hour == 12 {
+				hour = 0
+			}
+
+			// Validate time components
+			if err := validateTime(hour, minute, second); err != nil {
+				return time.Time{}, err
+			}
+
+			// Use base date from settings
+			base := ctx.settings.RelativeBase
+			return time.Date(base.Year(), base.Month(), base.Day(), hour, minute, second, 0, base.Location()), nil
+		},
+	},
+	// 12-hour format without colon seconds (9:15AM, 3:30PM)
+	{
+		regex: regexp.MustCompile(`(?i)^(\d{1,2}):(\d{2})(AM|PM)$`),
+		parser: func(ctx *parserContext, matches []string) (time.Time, error) {
+			hour, _ := strconv.Atoi(matches[1])
+			minute, _ := strconv.Atoi(matches[2])
+			period := strings.ToUpper(matches[3])
+
+			// Convert to 24-hour format
+			if period == "PM" && hour != 12 {
+				hour += 12
+			} else if period == "AM" && hour == 12 {
+				hour = 0
+			}
+
+			// Validate time components
+			if err := validateTime(hour, minute, 0); err != nil {
+				return time.Time{}, err
+			}
+
+			// Use base date from settings
+			base := ctx.settings.RelativeBase
+			return time.Date(base.Year(), base.Month(), base.Day(), hour, minute, 0, 0, base.Location()), nil
+		},
+	},
+	// Short format (9am, 3pm, 12pm)
+	{
+		regex: regexp.MustCompile(`(?i)^(\d{1,2})(am|pm)$`),
+		parser: func(ctx *parserContext, matches []string) (time.Time, error) {
+			hour, _ := strconv.Atoi(matches[1])
+			period := strings.ToLower(matches[2])
+
+			// Convert to 24-hour format
+			if period == "pm" && hour != 12 {
+				hour += 12
+			} else if period == "am" && hour == 12 {
+				hour = 0
+			}
+
+			// Validate time components
+			if err := validateTime(hour, 0, 0); err != nil {
+				return time.Time{}, err
+			}
+
+			// Use base date from settings
+			base := ctx.settings.RelativeBase
+			return time.Date(base.Year(), base.Month(), base.Day(), hour, 0, 0, 0, base.Location()), nil
+		},
+	},
+	// 24-hour format with seconds (14:30:00, 09:15:45)
+	{
+		regex: regexp.MustCompile(`^(\d{1,2}):(\d{2}):(\d{2})$`),
+		parser: func(ctx *parserContext, matches []string) (time.Time, error) {
+			hour, _ := strconv.Atoi(matches[1])
+			minute, _ := strconv.Atoi(matches[2])
+			second, _ := strconv.Atoi(matches[3])
+
+			// Validate time components
+			if err := validateTime(hour, minute, second); err != nil {
+				return time.Time{}, err
+			}
+
+			// Use base date from settings
+			base := ctx.settings.RelativeBase
+			return time.Date(base.Year(), base.Month(), base.Day(), hour, minute, second, 0, base.Location()), nil
+		},
+	},
+	// 24-hour format without seconds (14:30, 09:15, 23:59)
+	{
+		regex: regexp.MustCompile(`^(\d{1,2}):(\d{2})$`),
+		parser: func(ctx *parserContext, matches []string) (time.Time, error) {
+			hour, _ := strconv.Atoi(matches[1])
+			minute, _ := strconv.Atoi(matches[2])
+
+			// Validate time components
+			if err := validateTime(hour, minute, 0); err != nil {
+				return time.Time{}, err
+			}
+
+			// Use base date from settings
+			base := ctx.settings.RelativeBase
+			return time.Date(base.Year(), base.Month(), base.Day(), hour, minute, 0, 0, base.Location()), nil
+		},
+	},
+	// Natural language time expressions (v1.2 Phase 5)
+	// "quarter past 3", "half past 9", "quarter to 5"
+	{
+		regex: regexp.MustCompile(`(?i)^(quarter|half)\s+(past|to|before|after)\s+(\d{1,2})$`),
+		parser: func(ctx *parserContext, matches []string) (time.Time, error) {
+			fraction := strings.ToLower(matches[1])
+			direction := strings.ToLower(matches[2])
+			hour, _ := strconv.Atoi(matches[3])
+
+			var minute int
+			if fraction == "quarter" {
+				minute = 15
+			} else { // half
+				minute = 30
+			}
+
+			// Adjust for "to" or "before"
+			if direction == "to" || direction == "before" {
+				minute = 60 - minute
+				hour--
+				if hour < 0 {
+					hour = 23
+				}
+			}
+
+			// Validate and use 24-hour format
+			if hour > 23 {
+				return time.Time{}, &ErrInvalidDate{
+					Year:   0,
+					Month:  0,
+					Day:    0,
+					Reason: fmt.Sprintf("hour %d out of range (0-23)", hour),
+				}
+			}
+
+			base := ctx.settings.RelativeBase
+			return time.Date(base.Year(), base.Month(), base.Day(), hour, minute, 0, 0, base.Location()), nil
+		},
+	},
+	// "quarter past noon", "half past midnight", "quarter to noon"
+	{
+		regex: regexp.MustCompile(`(?i)^(quarter|half)\s+(past|to|before|after)\s+(noon|midnight)$`),
+		parser: func(ctx *parserContext, matches []string) (time.Time, error) {
+			fraction := strings.ToLower(matches[1])
+			direction := strings.ToLower(matches[2])
+			reference := strings.ToLower(matches[3])
+
+			var hour, minute int
+			if reference == "noon" {
+				hour = 12
+			} else { // midnight
+				hour = 0
+			}
+
+			if fraction == "quarter" {
+				minute = 15
+			} else { // half
+				minute = 30
+			}
+
+			// Adjust for "to" or "before"
+			if direction == "to" || direction == "before" {
+				minute = 60 - minute
+				hour--
+				if hour < 0 {
+					hour = 23
+				}
+			}
+
+			base := ctx.settings.RelativeBase
+			return time.Date(base.Year(), base.Month(), base.Day(), hour, minute, 0, 0, base.Location()), nil
+		},
+	},
+	// Basic "noon" and "midnight"
+	{
+		regex: regexp.MustCompile(`(?i)^(noon|midnight)$`),
+		parser: func(ctx *parserContext, matches []string) (time.Time, error) {
+			word := strings.ToLower(matches[1])
+			base := ctx.settings.RelativeBase
+
+			switch word {
+			case "noon":
+				return time.Date(base.Year(), base.Month(), base.Day(), 12, 0, 0, 0, base.Location()), nil
+			case "midnight":
+				return time.Date(base.Year(), base.Month(), base.Day(), 0, 0, 0, 0, base.Location()), nil
+			}
+
+			return time.Time{}, fmt.Errorf("unrecognized time word: %s", word)
+		},
+	},
+}
+
+// validateTime validates time components
+func validateTime(hour, minute, second int) error {
+	if hour < 0 || hour > 23 {
+		return &ErrInvalidDate{Year: 0, Month: 0, Day: 0, Reason: fmt.Sprintf("hour %d out of range (0-23)", hour)}
+	}
+	if minute < 0 || minute > 59 {
+		return &ErrInvalidDate{Year: 0, Month: 0, Day: 0, Reason: fmt.Sprintf("minute %d out of range (0-59)", minute)}
+	}
+	if second < 0 || second > 59 {
+		return &ErrInvalidDate{Year: 0, Month: 0, Day: 0, Reason: fmt.Sprintf("second %d out of range (0-59)", second)}
+	}
+	return nil
+}
+
+// tryParseTime attempts to parse time-only inputs
+func tryParseTime(ctx *parserContext) (time.Time, error) {
+	input := strings.TrimSpace(ctx.input)
+
+	// Try multi-language time expressions first
+	if result, err := tryParseMultiLangTime(ctx, input); err == nil {
+		return result, nil
+	}
+
+	for _, pattern := range timePatterns {
+		matches := pattern.regex.FindStringSubmatch(input)
+		if matches != nil {
+			return pattern.parser(ctx, matches)
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("no time pattern matched")
+}
+
+// ParseTime is a convenience function for parsing time-only strings with a base date
+func ParseTime(timeStr string, baseDate time.Time) (time.Time, error) {
+	settings := &Settings{
+		RelativeBase: baseDate,
+	}
+
+	ctx := &parserContext{
+		input:    timeStr,
+		settings: settings,
+	}
+
+	return tryParseTime(ctx)
+}
+
+// tryParseMultiLangTime attempts to parse time expressions in multiple languages.
+func tryParseMultiLangTime(ctx *parserContext, input string) (time.Time, error) {
+	input = strings.ToLower(strings.TrimSpace(input))
+	base := ctx.settings.RelativeBase
+
+	// Try each language's time terms
+	for _, lang := range ctx.languages {
+		if lang.TimeTerms == nil {
+			continue
+		}
+
+		// Try special terms: noon, midnight
+		for _, noonTerm := range lang.TimeTerms.Noon {
+			if input == strings.ToLower(noonTerm) {
+				return time.Date(base.Year(), base.Month(), base.Day(), 12, 0, 0, 0, base.Location()), nil
+			}
+		}
+
+		for _, midnightTerm := range lang.TimeTerms.Midnight {
+			if input == strings.ToLower(midnightTerm) {
+				return time.Date(base.Year(), base.Month(), base.Day(), 0, 0, 0, 0, base.Location()), nil
+			}
+		}
+
+		// Try "X y cuarto" (X and quarter) patterns - Spanish "quarter past"
+		if result, err := tryParseYCuarto(ctx, input, lang); err == nil {
+			return result, nil
+		}
+
+		// Try "X y media" (X and half) patterns - Spanish "half past"
+		if result, err := tryParseYMedia(ctx, input, lang); err == nil {
+			return result, nil
+		}
+
+		// Try "menos cuarto las X" patterns - Spanish "quarter to"
+		if result, err := tryParseMenosCuarto(ctx, input, lang); err == nil {
+			return result, nil
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("no multi-language time pattern matched")
+}
+
+// tryParseYCuarto parses Spanish "X y cuarto" (quarter past X)
+func tryParseYCuarto(ctx *parserContext, input string, lang *translations.Language) (time.Time, error) {
+	if lang.TimeTerms == nil {
+		return time.Time{}, fmt.Errorf("no time terms")
+	}
+
+	// Try with each "past" term
+	for _, pastTerm := range lang.TimeTerms.Past {
+		if pastTerm == "" {
+			continue
+		}
+
+		// Try with each "quarter" term
+		for _, quarterTerm := range lang.TimeTerms.Quarter {
+			if quarterTerm == "" {
+				continue
+			}
+
+			// Pattern: "3 y cuarto" or similar
+			pattern := fmt.Sprintf(`^(\d{1,2})\s+%s\s+%s$`,
+				regexp.QuoteMeta(strings.ToLower(pastTerm)),
+				regexp.QuoteMeta(strings.ToLower(quarterTerm)))
+			re := regexp.MustCompile(pattern)
+
+			if matches := re.FindStringSubmatch(input); matches != nil {
+				hour, _ := strconv.Atoi(matches[1])
+				minute := 15
+
+				if hour > 23 {
+					return time.Time{}, &ErrInvalidDate{
+						Year:   0,
+						Month:  0,
+						Day:    0,
+						Reason: fmt.Sprintf("hour %d out of range (0-23)", hour),
+					}
+				}
+
+				base := ctx.settings.RelativeBase
+				return time.Date(base.Year(), base.Month(), base.Day(), hour, minute, 0, 0, base.Location()), nil
+			}
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("no match")
+}
+
+// tryParseYMedia parses Spanish "X y media" (half past X)
+func tryParseYMedia(ctx *parserContext, input string, lang *translations.Language) (time.Time, error) {
+	if lang.TimeTerms == nil {
+		return time.Time{}, fmt.Errorf("no time terms")
+	}
+
+	// Try with each "past" term
+	for _, pastTerm := range lang.TimeTerms.Past {
+		if pastTerm == "" {
+			continue
+		}
+
+		// Try with each "half" term
+		for _, halfTerm := range lang.TimeTerms.Half {
+			if halfTerm == "" {
+				continue
+			}
+
+			// Pattern: "3 y media" or similar
+			pattern := fmt.Sprintf(`^(\d{1,2})\s+%s\s+%s$`,
+				regexp.QuoteMeta(strings.ToLower(pastTerm)),
+				regexp.QuoteMeta(strings.ToLower(halfTerm)))
+			re := regexp.MustCompile(pattern)
+
+			if matches := re.FindStringSubmatch(input); matches != nil {
+				hour, _ := strconv.Atoi(matches[1])
+				minute := 30
+
+				if hour > 23 {
+					return time.Time{}, &ErrInvalidDate{
+						Year:   0,
+						Month:  0,
+						Day:    0,
+						Reason: fmt.Sprintf("hour %d out of range (0-23)", hour),
+					}
+				}
+
+				base := ctx.settings.RelativeBase
+				return time.Date(base.Year(), base.Month(), base.Day(), hour, minute, 0, 0, base.Location()), nil
+			}
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("no match")
+}
+
+// tryParseMenosCuarto parses Spanish "menos cuarto las X" (quarter to X)
+func tryParseMenosCuarto(ctx *parserContext, input string, lang *translations.Language) (time.Time, error) {
+	if lang.TimeTerms == nil {
+		return time.Time{}, fmt.Errorf("no time terms")
+	}
+
+	// Try with each "to" term
+	for _, toTerm := range lang.TimeTerms.To {
+		if toTerm == "" {
+			continue
+		}
+
+		// Try with each "quarter" term
+		for _, quarterTerm := range lang.TimeTerms.Quarter {
+			if quarterTerm == "" {
+				continue
+			}
+
+			// Pattern: "menos cuarto las 3" or similar
+			pattern := fmt.Sprintf(`^%s\s+%s\s+(?:las\s+)?(\d{1,2})$`,
+				regexp.QuoteMeta(strings.ToLower(toTerm)),
+				regexp.QuoteMeta(strings.ToLower(quarterTerm)))
+			re := regexp.MustCompile(pattern)
+
+			if matches := re.FindStringSubmatch(input); matches != nil {
+				hour, _ := strconv.Atoi(matches[1])
+				minute := 45 // quarter to = 45 minutes of previous hour
+				hour--       // Go back one hour
+
+				if hour < 0 {
+					hour = 23
+				}
+
+				if hour > 23 {
+					return time.Time{}, &ErrInvalidDate{
+						Year:   0,
+						Month:  0,
+						Day:    0,
+						Reason: fmt.Sprintf("hour %d out of range (0-23)", hour),
+					}
+				}
+
+				base := ctx.settings.RelativeBase
+				return time.Date(base.Year(), base.Month(), base.Day(), hour, minute, 0, 0, base.Location()), nil
+			}
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("no match")
+}

@@ -1,5 +1,13 @@
 # GoDateParser
 
+[![Go Version](https://img.shields.io/github/go-mod/go-version/coredds/GoDateParser)](https://go.dev/)
+[![Release](https://img.shields.io/github/v/release/coredds/GoDateParser)](https://github.com/coredds/GoDateParser/releases)
+[![License](https://img.shields.io/github/license/coredds/GoDateParser)](https://github.com/coredds/GoDateParser/blob/master/LICENSE)
+[![CI](https://github.com/coredds/GoDateParser/workflows/CI/badge.svg)](https://github.com/coredds/GoDateParser/actions)
+[![CodeQL](https://github.com/coredds/GoDateParser/workflows/CodeQL/badge.svg)](https://github.com/coredds/GoDateParser/security/code-scanning)
+[![Codecov](https://codecov.io/gh/coredds/GoDateParser/branch/master/graph/badge.svg)](https://codecov.io/gh/coredds/GoDateParser)
+[![Go Reference](https://pkg.go.dev/badge/github.com/coredds/GoDateParser.svg)](https://pkg.go.dev/github.com/coredds/GoDateParser)
+
 A powerful Go library for parsing human-readable date strings in multiple formats and languages.
 
 ## Features

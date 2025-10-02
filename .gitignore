@@ -12,6 +12,7 @@
 *.out
 coverage.out
 coverage.html
+coverage.txt
 
 # Go workspace file
 go.work

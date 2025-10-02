@@ -4,7 +4,8 @@
 run:
   timeout: 5m
   tests: true
-  # Skip directories with multiple main packages
+  # Exclude directories with multiple main packages
+  skip-dirs-use-default: true
   skip-dirs:
     - examples
 
@@ -15,6 +16,9 @@ issues:
   max-same-issues: 0
   # Show all issues from all linters
   exclude-use-default: false
+  # Exclude examples directory from issue reporting
+  exclude-dirs:
+    - examples
 
 linters:
   enable:
@@ -39,11 +43,11 @@ linters-settings:
     check-type-assertions: false
     check-blank: false
   govet:
-    check-shadowing: false
+    settings:
+      shadow:
+        strict: false
   staticcheck:
     checks: ["all"]
-  unused:
-    check-exported: false
   gocritic:
     enabled-tags:
       - diagnostic

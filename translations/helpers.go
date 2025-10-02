@@ -34,7 +34,7 @@ func MatchesRelativeTerm(input string, terms []string) bool {
 	input = strings.ToLower(strings.TrimSpace(input))
 
 	for _, term := range terms {
-		if term != "" && strings.ToLower(term) == input {
+		if term != "" && strings.EqualFold(term, input) {
 			return true
 		}
 	}
@@ -105,7 +105,7 @@ func NormalizeTimeUnit(input string, languages []*Language) string {
 
 		checkUnit := func(terms []string, _ string) bool {
 			for _, term := range terms {
-				if strings.ToLower(term) == input {
+				if strings.EqualFold(term, input) {
 					return true
 				}
 			}

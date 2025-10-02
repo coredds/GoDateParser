@@ -287,13 +287,13 @@ func tryParseMultiLangTime(ctx *parserContext, input string) (time.Time, error) 
 
 		// Try special terms: noon, midnight
 		for _, noonTerm := range lang.TimeTerms.Noon {
-			if input == strings.ToLower(noonTerm) {
+			if strings.EqualFold(input, noonTerm) {
 				return time.Date(base.Year(), base.Month(), base.Day(), 12, 0, 0, 0, base.Location()), nil
 			}
 		}
 
 		for _, midnightTerm := range lang.TimeTerms.Midnight {
-			if input == strings.ToLower(midnightTerm) {
+			if strings.EqualFold(input, midnightTerm) {
 				return time.Date(base.Year(), base.Month(), base.Day(), 0, 0, 0, 0, base.Location()), nil
 			}
 		}

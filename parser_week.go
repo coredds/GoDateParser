@@ -77,7 +77,7 @@ var weekPatterns = []*weekPattern{
 	// Week only (current year): "W42", "Week 15"
 	{
 		regex: regexp.MustCompile(`(?i)^w(eek\s+)?(\d{1,2})$`),
-		parser: func(ctx *parserContext, matches []string) (time.Time, error) {
+		parser: func(_ *parserContext, matches []string) (time.Time, error) {
 			week, _ := strconv.Atoi(matches[2])
 
 			if week < 1 || week > 53 {

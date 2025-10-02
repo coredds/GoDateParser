@@ -110,91 +110,84 @@ func ParseDate(input string, opts *Settings) (time.Time, error) {
 	if isParserEnabled(settings, "timestamp") {
 		if result, err := parseTimestamp(ctx); err == nil {
 			return result, nil
-		} else {
-			// Check if it's a specific error type that should be returned as-is
-			if isSpecificError(err) {
-				return time.Time{}, err
-			}
-			parseErrors = append(parseErrors, err)
 		}
+		// Check if it's a specific error type that should be returned as-is
+		if isSpecificError(err) {
+			return time.Time{}, err
+		}
+		parseErrors = append(parseErrors, err)
 	}
 
 	// 2. Try absolute date parser
 	if isParserEnabled(settings, "absolute") {
 		if result, err := parseAbsolute(ctx); err == nil {
 			return result, nil
-		} else {
-			// Check if it's a specific error type that should be returned as-is
-			if isSpecificError(err) {
-				return time.Time{}, err
-			}
-			parseErrors = append(parseErrors, err)
 		}
+		// Check if it's a specific error type that should be returned as-is
+		if isSpecificError(err) {
+			return time.Time{}, err
+		}
+		parseErrors = append(parseErrors, err)
 	}
 
 	// 3. Try relative date parser
 	if isParserEnabled(settings, "relative") {
 		if result, err := parseRelative(ctx); err == nil {
 			return result, nil
-		} else {
-			// Check if it's a specific error type that should be returned as-is
-			if isSpecificError(err) {
-				return time.Time{}, err
-			}
-			parseErrors = append(parseErrors, err)
 		}
+		// Check if it's a specific error type that should be returned as-is
+		if isSpecificError(err) {
+			return time.Time{}, err
+		}
+		parseErrors = append(parseErrors, err)
 	}
 
 	// 4. Try time parser (v1.0 Phase 3B)
 	if isParserEnabled(settings, "time") {
 		if result, err := tryParseTime(ctx); err == nil {
 			return result, nil
-		} else {
-			// Check if it's a specific error type that should be returned as-is
-			if isSpecificError(err) {
-				return time.Time{}, err
-			}
-			parseErrors = append(parseErrors, err)
 		}
+		// Check if it's a specific error type that should be returned as-is
+		if isSpecificError(err) {
+			return time.Time{}, err
+		}
+		parseErrors = append(parseErrors, err)
 	}
 
 	// 5. Try incomplete date parser (v1.1 Phase 4)
 	if isParserEnabled(settings, "incomplete") {
 		if result, err := tryParseIncompleteDate(ctx); err == nil {
 			return result, nil
-		} else {
-			// Check if it's a specific error type that should be returned as-is
-			if isSpecificError(err) {
-				return time.Time{}, err
-			}
-			parseErrors = append(parseErrors, err)
 		}
+		// Check if it's a specific error type that should be returned as-is
+		if isSpecificError(err) {
+			return time.Time{}, err
+		}
+		parseErrors = append(parseErrors, err)
 	}
 
 	// 6. Try ordinal date parser (v1.1 Phase 4)
 	if isParserEnabled(settings, "ordinal") {
 		if result, err := tryParseOrdinalDate(ctx); err == nil {
 			return result, nil
-		} else {
-			// Check if it's a specific error type that should be returned as-is
-			if isSpecificError(err) {
-				return time.Time{}, err
-			}
-			parseErrors = append(parseErrors, err)
 		}
+		// Check if it's a specific error type that should be returned as-is
+		if isSpecificError(err) {
+			return time.Time{}, err
+		}
+		parseErrors = append(parseErrors, err)
 	}
 
 	// 7. Try week number parser (v1.2 Phase 5)
 	if isParserEnabled(settings, "week") {
 		if result, err := tryParseWeekNumber(ctx); err == nil {
 			return result, nil
-		} else {
-			// Check if it's a specific error type that should be returned as-is
-			if isSpecificError(err) {
-				return time.Time{}, err
-			}
-			parseErrors = append(parseErrors, err)
 		}
+		// Check if it's a specific error type that should be returned as-is
+		if isSpecificError(err) {
+			return time.Time{}, err
+		}
+		parseErrors = append(parseErrors, err)
 	}
 
 	// No parser succeeded - return helpful error

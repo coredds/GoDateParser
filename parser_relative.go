@@ -206,13 +206,13 @@ func tryParseMultiLangRelative(ctx *parserContext, input string) (time.Time, err
 		}
 
 		// Simple terms: yesterday, today, tomorrow
-		if input == strings.ToLower(lang.RelativeTerms.Yesterday) {
+		if strings.EqualFold(input, lang.RelativeTerms.Yesterday) {
 			return base.AddDate(0, 0, -1), nil
 		}
-		if input == strings.ToLower(lang.RelativeTerms.Today) {
+		if strings.EqualFold(input, lang.RelativeTerms.Today) {
 			return base, nil
 		}
-		if input == strings.ToLower(lang.RelativeTerms.Tomorrow) {
+		if strings.EqualFold(input, lang.RelativeTerms.Tomorrow) {
 			return base.AddDate(0, 0, 1), nil
 		}
 
@@ -521,7 +521,7 @@ func normalizeTimeUnit(unit string, lang *translations.Language) string {
 
 	checkUnit := func(terms []string, _ string) bool {
 		for _, term := range terms {
-			if strings.ToLower(term) == unit {
+			if strings.EqualFold(term, unit) {
 				return true
 			}
 		}
@@ -583,7 +583,7 @@ func tryCJKWeekdayModifier(ctx *parserContext, input string, lang *translations.
 
 	// Remove the modifier prefix
 	remainder := input[len(prefix):]
-	if len(remainder) == 0 {
+	if remainder == "" {
 		return time.Time{}, fmt.Errorf("no remainder after modifier")
 	}
 
@@ -634,13 +634,13 @@ func tryCJKWeekdayModifier(ctx *parserContext, input string, lang *translations.
 						// Now find the target weekday within that week
 						daysFromMonday := int(wdMatch.weekday - time.Monday)
 						if daysFromMonday < 0 {
-							daysFromMonday += 7
-						}
-						return startOfNextWeek.AddDate(0, 0, daysFromMonday), nil
-					} else { // month
-						baseDate := ctx.settings.RelativeBase.AddDate(0, 1, 0)
-						return findWeekday(baseDate, wdMatch.weekday, true), nil
+						daysFromMonday += 7
 					}
+					return startOfNextWeek.AddDate(0, 0, daysFromMonday), nil
+				}
+				// month
+				baseDate := ctx.settings.RelativeBase.AddDate(0, 1, 0)
+				return findWeekday(baseDate, wdMatch.weekday, true), nil
 				} else {
 					// Last week/month
 					if unit == "week" {
@@ -657,13 +657,13 @@ func tryCJKWeekdayModifier(ctx *parserContext, input string, lang *translations.
 						// Now find the target weekday within last week
 						daysToTarget := int(wdMatch.weekday - time.Monday)
 						if daysToTarget < 0 {
-							daysToTarget += 7
-						}
-						return startOfLastWeek.AddDate(0, 0, daysToTarget), nil
-					} else { // month
-						baseDate := ctx.settings.RelativeBase.AddDate(0, -1, 0)
-						return findWeekday(baseDate, wdMatch.weekday, false), nil
+						daysToTarget += 7
 					}
+					return startOfLastWeek.AddDate(0, 0, daysToTarget), nil
+				}
+				// month
+				baseDate := ctx.settings.RelativeBase.AddDate(0, -1, 0)
+				return findWeekday(baseDate, wdMatch.weekday, false), nil
 				}
 			}
 		}

@@ -361,7 +361,8 @@ func tryParsePeriodBoundary(ctx *parserContext, input string, lang *translations
 	base := ctx.settings.RelativeBase
 
 	// Build patterns for beginning/start/end
-	beginTerms := append(terms.Beginning, terms.Start...)
+	beginTerms := terms.Beginning
+	beginTerms = append(beginTerms, terms.Start...)
 	beginTerms = append(beginTerms, terms.First...)
 	endTerms := terms.End
 

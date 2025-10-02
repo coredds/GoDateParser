@@ -87,7 +87,7 @@ func newInvalidFormatError(input string) error {
 
 func suggestFormat(input string) string {
 	// Provide helpful suggestions based on common mistakes
-	if len(input) == 0 {
+	if input == "" {
 		return ""
 	}
 

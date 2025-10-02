@@ -342,11 +342,14 @@ func tryParseMultiLangMonthName(ctx *parserContext, input string) (time.Time, er
 	}
 
 	for _, pattern := range patterns {
-		if matches := pattern.regex.FindStringSubmatch(input); matches != nil {
-			day, month, year, err := pattern.parse(matches)
-			if err != nil {
-				continue
-			}
+		matches := pattern.regex.FindStringSubmatch(input)
+		if matches == nil {
+			continue
+		}
+		day, month, year, err := pattern.parse(matches)
+		if err != nil {
+			continue
+		}
 
 			// Handle 2-digit years
 			if year < 100 {

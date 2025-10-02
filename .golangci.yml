@@ -15,6 +15,19 @@ issues:
   # Exclude examples directory from issue reporting
   exclude-dirs:
     - examples
+  # Exclude all issues from examples directory
+  exclude-rules:
+    - path: examples/
+      linters:
+        - typecheck
+        - govet
+        - errcheck
+        - gosimple
+        - ineffassign
+        - staticcheck
+        - unused
+    - path: examples/.*\.go
+      text: ".*"
 
 linters:
   enable:

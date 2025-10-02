@@ -124,9 +124,9 @@ func TestPortuguese_RelativeAgo(t *testing.T) {
 		{"há 2 dias", 13},
 		{"há 1 semana", 8},
 		{"há 2 semanas", 1},
-		// Note: "X dias atrás" pattern (suffix) not currently supported by parser
-		// {"1 dia atrás", 14},
-		// {"2 dias atrás", 13},
+		// Suffix pattern: "X dias atrás"
+		{"1 dia atrás", 14},
+		{"2 dias atrás", 13},
 	}
 
 	for _, tt := range tests {
@@ -254,10 +254,9 @@ func TestPortuguese_TimeExpressions(t *testing.T) {
 	}{
 		{"meio-dia", 12, 0},
 		{"meia-noite", 0, 0},
-		// Note: Complex time expressions with "um quarto" and "para as" not fully supported
-		// {"3 e um quarto", 3, 15},
+		{"3 e um quarto", 3, 15},
 		{"3 e meia", 3, 30},
-		// {"quinze para as 3", 2, 45},
+		{"quinze para as 3", 2, 45},
 	}
 
 	for _, tt := range tests {

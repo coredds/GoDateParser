@@ -215,9 +215,16 @@ func tryParseMultiLangRelative(ctx *parserContext, input string) (time.Time, err
 			return base.AddDate(0, 0, 1), nil
 		}
 
-		// Try "hace X días" (X days ago) pattern
+		// Try "hace X días" (X days ago) pattern - PREFIX
 		for _, agoTerm := range lang.RelativeTerms.Ago {
 			if result, err := tryParseAgoPattern(ctx, input, lang, agoTerm); err == nil {
+				return result, nil
+			}
+		}
+
+		// Try "X días atrás" (X days ago) pattern - SUFFIX
+		for _, agoTerm := range lang.RelativeTerms.Ago {
+			if result, err := tryParseAgoSuffixPattern(ctx, input, lang, agoTerm); err == nil {
 				return result, nil
 			}
 		}
@@ -261,6 +268,27 @@ func tryParseAgoPattern(ctx *parserContext, input string, lang *translations.Lan
 	}
 
 	pattern := fmt.Sprintf(`^%s\s+(\d+)\s+(%s)$`, regexp.QuoteMeta(strings.ToLower(agoTerm)), units)
+	re := regexp.MustCompile(pattern)
+
+	if matches := re.FindStringSubmatch(input); matches != nil {
+		amount, _ := strconv.Atoi(matches[1])
+		unit := normalizeTimeUnit(matches[2], lang)
+		return addDuration(ctx.settings.RelativeBase, -amount, unit), nil
+	}
+
+	return time.Time{}, fmt.Errorf("no match")
+}
+
+// tryParseAgoSuffixPattern parses suffix patterns like "2 días atrás" (2 days ago)
+func tryParseAgoSuffixPattern(ctx *parserContext, input string, lang *translations.Language, agoTerm string) (time.Time, error) {
+	// Build time unit pattern
+	units := buildTimeUnitPattern(lang)
+	if units == "" {
+		return time.Time{}, fmt.Errorf("no time units")
+	}
+
+	// Pattern: "2 días atrás" - number FIRST, unit SECOND, ago term LAST
+	pattern := fmt.Sprintf(`^(\d+)\s+(%s)\s+%s$`, units, regexp.QuoteMeta(strings.ToLower(agoTerm)))
 	re := regexp.MustCompile(pattern)
 
 	if matches := re.FindStringSubmatch(input); matches != nil {

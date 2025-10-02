@@ -313,6 +313,11 @@ func tryParseMultiLangTime(ctx *parserContext, input string) (time.Time, error) 
 			return result, nil
 		}
 
+		// Try "quinze para as X" patterns - Portuguese "quarter to" (reversed order)
+		if result, err := tryParseQuarterTo(ctx, input, lang); err == nil {
+			return result, nil
+		}
+
 		// Try "15h30" or "15h" patterns - French time format
 		if result, err := tryParseFrenchHFormat(ctx, input, lang); err == nil {
 			return result, nil
@@ -437,8 +442,8 @@ func tryParseMenosCuarto(ctx *parserContext, input string, lang *translations.La
 				continue
 			}
 
-			// Pattern: "menos cuarto las 3" or similar
-			pattern := fmt.Sprintf(`^%s\s+%s\s+(?:las\s+)?(\d{1,2})$`,
+			// Pattern: "menos cuarto las 3" or "quinze para as 3" - with optional article
+			pattern := fmt.Sprintf(`^%s\s+%s\s+(?:las\s+|as\s+)?(\d{1,2})$`,
 				regexp.QuoteMeta(strings.ToLower(toTerm)),
 				regexp.QuoteMeta(strings.ToLower(quarterTerm)))
 			re := regexp.MustCompile(pattern)
@@ -522,6 +527,57 @@ func tryParseFrenchHeures(ctx *parserContext, input string, lang *translations.L
 
 			base := ctx.settings.RelativeBase
 			return time.Date(base.Year(), base.Month(), base.Day(), hour, minute, 0, 0, base.Location()), nil
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("no match")
+}
+
+// tryParseQuarterTo parses Portuguese "quinze para as 3" (quarter to 3) - quarter FIRST
+func tryParseQuarterTo(ctx *parserContext, input string, lang *translations.Language) (time.Time, error) {
+	if lang.TimeTerms == nil {
+		return time.Time{}, fmt.Errorf("no time terms")
+	}
+
+	// Try with each "quarter" term
+	for _, quarterTerm := range lang.TimeTerms.Quarter {
+		if quarterTerm == "" {
+			continue
+		}
+
+		// Try with each "to" term
+		for _, toTerm := range lang.TimeTerms.To {
+			if toTerm == "" {
+				continue
+			}
+
+			// Pattern: "quinze para as 3" - QUARTER first, TO second, HOUR last
+			pattern := fmt.Sprintf(`^%s\s+%s\s+(?:as\s+|o\s+)?(\d{1,2})$`,
+				regexp.QuoteMeta(strings.ToLower(quarterTerm)),
+				regexp.QuoteMeta(strings.ToLower(toTerm)))
+			re := regexp.MustCompile(pattern)
+
+			if matches := re.FindStringSubmatch(input); matches != nil {
+				hour, _ := strconv.Atoi(matches[1])
+				minute := 45 // quarter to = 45 minutes of previous hour
+				hour--       // Go back one hour
+
+				if hour < 0 {
+					hour = 23
+				}
+
+				if hour > 23 {
+					return time.Time{}, &ErrInvalidDate{
+						Year:   0,
+						Month:  0,
+						Day:    0,
+						Reason: fmt.Sprintf("hour %d out of range (0-23)", hour),
+					}
+				}
+
+				base := ctx.settings.RelativeBase
+				return time.Date(base.Year(), base.Month(), base.Day(), hour, minute, 0, 0, base.Location()), nil
+			}
 		}
 	}
 

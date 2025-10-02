@@ -90,7 +90,7 @@ func NewPortugueseTranslation() *Language {
 		TimeTerms: &TimeTerms{
 			Noon:     []string{"meio-dia", "meio dia", "meiodia"},
 			Midnight: []string{"meia-noite", "meia noite", "meianoite"},
-			Quarter:  []string{"quarto", "quinze"},
+			Quarter:  []string{"quarto", "um quarto", "uma quarto", "quinze"},
 			Half:     []string{"meia", "meio", "trinta"},
 			// "e" for past (3 e meia = half past 3)
 			Past: []string{"e"},

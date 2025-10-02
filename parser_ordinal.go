@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coredds/GoDateParser/translations"
+	"github.com/coredds/godateparser/translations"
 )
 
 // Ordinal date patterns - dates with ordinal numbers

@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coredds/GoDateParser/translations"
+	"github.com/coredds/godateparser/translations"
 )
 
 // Time parsing patterns for v1.0.0 Phase 3B

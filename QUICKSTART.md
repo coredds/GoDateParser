@@ -3,7 +3,7 @@
 ## Installation
 
 ```bash
-go get github.com/coredds/GoDateParser
+go get github.com/coredds/godateparser
 ```
 
 ## 5-Minute Tutorial
@@ -15,7 +15,7 @@ package main
 
 import (
     "fmt"
-    "github.com/coredds/GoDateParser"
+    "github.com/coredds/godateparser"
 )
 
 func main() {

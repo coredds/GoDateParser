@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coredds/GoDateParser/translations"
+	"github.com/coredds/godateparser/translations"
 )
 
 // Incomplete date patterns - dates missing year, day, or both

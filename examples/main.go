@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	godateparser "github.com/coredds/GoDateParser"
+	godateparser "github.com/coredds/godateparser"
 )
 
 func main() {

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coredds/GoDateParser/translations"
+	"github.com/coredds/godateparser/translations"
 )
 
 // Common absolute date patterns

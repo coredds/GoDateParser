@@ -1,3 +1,3 @@
-module github.com/coredds/GoDateParser
+module github.com/coredds/godateparser
 
 go 1.23

@@ -3,7 +3,7 @@ package godateparser
 import (
 	"time"
 
-	"github.com/coredds/GoDateParser/translations"
+	"github.com/coredds/godateparser/translations"
 )
 
 // monthNameToNumberWithLangs converts a month name using specific languages.

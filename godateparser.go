@@ -7,7 +7,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/coredds/GoDateParser/translations"
+	"github.com/coredds/godateparser/translations"
 )
 
 // Settings defines customizable parsing behavior for date parsing operations.

@@ -1,12 +1,12 @@
 # GoDateParser
 
-[![Go Version](https://img.shields.io/github/go-mod/go-version/coredds/GoDateParser)](https://go.dev/)
-[![Release](https://img.shields.io/github/v/release/coredds/GoDateParser)](https://github.com/coredds/GoDateParser/releases)
-[![License](https://img.shields.io/github/license/coredds/GoDateParser)](https://github.com/coredds/GoDateParser/blob/master/LICENSE)
-[![CI](https://github.com/coredds/GoDateParser/workflows/CI/badge.svg)](https://github.com/coredds/GoDateParser/actions)
-[![CodeQL](https://github.com/coredds/GoDateParser/workflows/CodeQL/badge.svg)](https://github.com/coredds/GoDateParser/security/code-scanning)
-[![Codecov](https://codecov.io/gh/coredds/GoDateParser/branch/master/graph/badge.svg)](https://codecov.io/gh/coredds/GoDateParser)
-[![Go Reference](https://pkg.go.dev/badge/github.com/coredds/GoDateParser.svg)](https://pkg.go.dev/github.com/coredds/GoDateParser)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/coredds/godateparser)](https://go.dev/)
+[![Release](https://img.shields.io/github/v/release/coredds/godateparser)](https://github.com/coredds/godateparser/releases)
+[![License](https://img.shields.io/github/license/coredds/godateparser)](https://github.com/coredds/godateparser/blob/master/LICENSE)
+[![CI](https://github.com/coredds/godateparser/workflows/CI/badge.svg)](https://github.com/coredds/godateparser/actions)
+[![CodeQL](https://github.com/coredds/godateparser/workflows/CodeQL/badge.svg)](https://github.com/coredds/godateparser/security/code-scanning)
+[![Codecov](https://codecov.io/gh/coredds/godateparser/branch/master/graph/badge.svg)](https://codecov.io/gh/coredds/godateparser)
+[![Go Reference](https://pkg.go.dev/badge/github.com/coredds/godateparser.svg)](https://pkg.go.dev/github.com/coredds/godateparser)
 
 A powerful Go library for parsing human-readable date strings in multiple formats and languages.
 
@@ -41,7 +41,7 @@ GoDateParser v1.3.1 supports **English**, **Spanish**, **Portuguese (Brazil)**, 
 ## Installation
 
 ```bash
-go get github.com/coredds/GoDateParser
+go get github.com/coredds/godateparser
 ```
 
 ## Quick Start
@@ -51,7 +51,7 @@ package main
 
 import (
     "fmt"
-    "github.com/coredds/GoDateParser"
+    "github.com/coredds/godateparser"
 )
 
 func main() {

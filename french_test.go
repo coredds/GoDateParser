@@ -425,10 +425,6 @@ func TestFrench_ThisNextLast(t *testing.T) {
 		{"ce lundi", "ce lundi", time.Monday},
 		{"cet mercredi", "cet mercredi", time.Wednesday},
 		{"cette vendredi", "cette vendredi", time.Friday},
-		// Note: "this week" / "cette semaine" is not currently supported
-		// The parser supports "this + weekday" but not "this + period"
-		// This would require adding support for period boundary expressions in parser_relative_extended.go
-		// {"cette semaine", "cette semaine", time.Saturday},
 	}
 
 	for _, tt := range tests {
@@ -442,6 +438,29 @@ func TestFrench_ThisNextLast(t *testing.T) {
 				t.Errorf("Weekday = %v, want %v", result.Weekday(), tt.wantWeekday)
 			}
 		})
+	}
+}
+
+func TestFrench_ThisWeek(t *testing.T) {
+	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC) // Saturday
+	settings := &Settings{
+		RelativeBase: refTime,
+		Languages:    []string{"fr", "en"},
+	}
+
+	result, err := ParseDate("cette semaine", settings)
+	if err != nil {
+		t.Errorf("ParseDate() error = %v", err)
+		return
+	}
+
+	// "this week" should return the start of the current week (Monday)
+	expectedDay := 10 // Monday, June 10, 2024
+	if result.Day() != expectedDay {
+		t.Errorf("Day = %v, want %v", result.Day(), expectedDay)
+	}
+	if result.Weekday() != time.Monday {
+		t.Errorf("Weekday = %v, want Monday", result.Weekday())
 	}
 }
 

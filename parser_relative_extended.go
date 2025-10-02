@@ -368,6 +368,7 @@ func tryParsePeriodBoundary(ctx *parserContext, input string, lang *translations
 	// Try "beginning/start/end of month/year/week"
 	periods := map[string]string{
 		"mes":     "month",
+		"mês":     "month", // Portuguese
 		"meses":   "month",
 		"año":     "year",
 		"ano":     "year",
@@ -378,6 +379,7 @@ func tryParsePeriodBoundary(ctx *parserContext, input string, lang *translations
 		"month":   "month",
 		"year":    "year",
 		"week":    "week",
+		"mois":    "month", // French
 	}
 
 	for periodEs, periodEn := range periods {
@@ -474,6 +476,7 @@ func tryParseThisNextLast(ctx *parserContext, input string, lang *translations.L
 		// "this month/year/week" / "este mes/año/semana"
 		periods := map[string]string{
 			"mes":     "month",
+			"mês":     "month", // Portuguese
 			"meses":   "month",
 			"año":     "year",
 			"ano":     "year",
@@ -481,6 +484,8 @@ func tryParseThisNextLast(ctx *parserContext, input string, lang *translations.L
 			"años":    "year",
 			"semana":  "week",
 			"semanas": "week",
+			"semaine": "week", // French
+			"mois":    "month", // French
 		}
 		for periodEs, periodEn := range periods {
 			pattern := fmt.Sprintf(`^%s\s+%s$`, regexp.QuoteMeta(thisTerm), regexp.QuoteMeta(periodEs))

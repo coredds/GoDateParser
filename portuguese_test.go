@@ -475,10 +475,9 @@ func TestPortuguese_PeriodBoundaries(t *testing.T) {
 		wantYear  int
 	}{
 		// Beginning/end of periods
-		// Note: "início/fim de mês" pattern not currently supported by parser
-		// {"início de mês", time.October, 1, 2024},
-		// {"começo de mês", time.October, 1, 2024},
-		// {"fim de mês", time.October, 31, 2024},
+		{"início de mês", time.October, 1, 2024},
+		{"começo de mês", time.October, 1, 2024},
+		{"fim de mês", time.October, 31, 2024},
 		{"início de ano", time.January, 1, 2024},
 		{"fim de ano", time.December, 31, 2024},
 		{"início de semana", time.October, 14, 2024}, // Monday of current week
@@ -492,10 +491,9 @@ func TestPortuguese_PeriodBoundaries(t *testing.T) {
 		{"ultimo ano", time.October, 15, 2023},
 
 		// Beginning/end of next/last periods
-		// Note: Complex compound patterns like "início de próximo mês" not currently supported
-		// {"início de próximo mês", time.November, 1, 2024},
-		// {"fim de próximo mês", time.November, 30, 2024},
-		// {"início de último mês", time.September, 1, 2024},
+		{"início de próximo mês", time.November, 1, 2024},
+		{"fim de próximo mês", time.November, 30, 2024},
+		{"início de último mês", time.September, 1, 2024},
 		{"fim de ultimo ano", time.December, 31, 2023},
 	}
 
@@ -538,8 +536,7 @@ func TestPortuguese_ThisNextLast(t *testing.T) {
 		{"esta sexta", time.October, 18, time.Friday},
 
 		// "este/esta" (this) with periods
-		// Note: "este mês" pattern not currently supported by parser
-		// {"este mês", time.October, 1, 0},
+		{"este mês", time.October, 1, 0},
 		{"esta semana", time.October, 14, 0}, // Monday (start of week)
 	}
 

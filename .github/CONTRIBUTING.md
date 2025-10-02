@@ -1,11 +1,11 @@
-# Contributing to GoDateParser
+# Contributing to godateparser
 
-Thank you for your interest in contributing to GoDateParser! We welcome contributions from the community.
+Thank you for your interest in contributing to godateparser! We welcome contributions from the community.
 
 ## Getting Started
 
 1. Fork the repository
-2. Clone your fork: `git clone https://github.com/YOUR-USERNAME/GoDateParser.git`
+2. Clone your fork: `git clone https://github.com/YOUR-USERNAME/godateparser.git`
 3. Create a feature branch: `git checkout -b feature/your-feature-name`
 4. Make your changes
 5. Run tests: `go test ./...`
@@ -67,5 +67,5 @@ See `translations/portuguese.go` and `portuguese_test.go` as examples.
 
 Feel free to open an issue for any questions about contributing.
 
-Thank you for helping make GoDateParser better!
+Thank you for helping make godateparser better!
 

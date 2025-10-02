@@ -6,7 +6,7 @@ import (
 )
 
 // ============================================================================
-// GoDateParser v0.3.0 Test Suite - Timezone Support
+// godateparser v0.3.0 Test Suite - Timezone Support
 // ============================================================================
 //
 // This file contains tests for v0.3.0 features:

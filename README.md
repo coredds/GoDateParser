@@ -1,4 +1,4 @@
-# GoDateParser
+# godateparser
 
 [![Go Version](https://img.shields.io/github/go-mod/go-version/coredds/godateparser)](https://go.dev/)
 [![Release](https://img.shields.io/github/v/release/coredds/godateparser)](https://github.com/coredds/godateparser/releases)
@@ -12,7 +12,7 @@ A powerful Go library for parsing human-readable date strings in multiple format
 
 ## Features
 
-GoDateParser v1.3.1 supports **English**, **Spanish**, **Portuguese (Brazil)**, and **French (France)** with comprehensive date parsing capabilities.
+godateparser v1.3.1 supports **English**, **Spanish**, **Portuguese (Brazil)**, and **French (France)** with comprehensive date parsing capabilities.
 
 ### Core Parsing
 - **Absolute Dates**: ISO 8601, numeric formats (MDY/DMY/YMD), month names, two-digit years
@@ -363,7 +363,7 @@ go test -bench=. -benchmem
 
 ## Performance
 
-GoDateParser is optimized for performance with efficient regex patterns and minimal allocations. Benchmark results on typical hardware:
+godateparser is optimized for performance with efficient regex patterns and minimal allocations. Benchmark results on typical hardware:
 
 ```
 BenchmarkParseDate_ISO-8          500000    2500 ns/op
@@ -383,7 +383,7 @@ BenchmarkExtractDates-8           100000   15000 ns/op
 
 ## Multi-Language Support
 
-GoDateParser supports multiple languages with automatic detection or explicit selection.
+godateparser supports multiple languages with automatic detection or explicit selection.
 
 ### Supported Languages
 

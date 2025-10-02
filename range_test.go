@@ -7,7 +7,7 @@ import (
 )
 
 // ============================================================================
-// GoDateParser v1.0.0 Phase 3B Test Suite - Date Range Parsing
+// godateparser v1.0.0 Phase 3B Test Suite - Date Range Parsing
 // ============================================================================
 //
 // This file contains tests for Phase 3B range parsing features:

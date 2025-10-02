@@ -13,7 +13,7 @@ We release patches for security vulnerabilities in the following versions:
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in GoDateParser, please report it by emailing the maintainers directly. Please do not open a public issue.
+If you discover a security vulnerability in godateparser, please report it by emailing the maintainers directly. Please do not open a public issue.
 
 **Please include the following information:**
 
@@ -42,5 +42,5 @@ If you discover a security vulnerability in GoDateParser, please report it by em
 
 Security updates will be released as patch versions (e.g., 1.3.2) and documented in the CHANGELOG.md file.
 
-Thank you for helping keep GoDateParser and its users safe!
+Thank you for helping keep godateparser and its users safe!
 

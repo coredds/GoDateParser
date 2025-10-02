@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	fmt.Println("=== GoDateParser Examples ===")
+	fmt.Println("=== godateparser Examples ===")
 	fmt.Println()
 
 	// Example 1: Basic absolute date parsing

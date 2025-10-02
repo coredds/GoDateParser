@@ -1,4 +1,4 @@
-# GoDateParser - Quick Start Guide
+# godateparser - Quick Start Guide
 
 ## Installation
 
@@ -186,7 +186,7 @@ go build -o example examples/main.go
 
 ## Multi-Language Support
 
-GoDateParser supports English and Spanish with automatic detection.
+godateparser supports English and Spanish with automatic detection.
 
 ### Automatic Language Detection
 

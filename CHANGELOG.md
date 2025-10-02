@@ -5,6 +5,90 @@ All notable changes to godateparser will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.3] - 2025-10-02
+
+### Added
+- **CJK Weekday Modifier Patterns**: Complex patterns combining next/last + week + specific weekday
+  - Japanese: `来週月曜` (next week Monday), `先週金曜` (last week Friday), `来週月曜日` (with 日 suffix)
+  - Chinese: `下周一` (next week Monday), `上周五` (last week Friday), `下星期一` (using 星期)
+  - Supports both week and month modifiers with specific weekdays
+  - Intelligent greedy longest-match strategy for correct tokenization
+  - Handles ambiguous characters (e.g., 月 = month OR part of 月曜 Monday)
+
+- **Enhanced Chinese Language Support**:
+  - Short-form weekday names for compound expressions: `一`, `二`, `三`, `四`, `五`, `六`, `日`, `天`
+  - These enable proper parsing of patterns like `下周一` where `一` alone means Monday
+
+- **New Parser Function**:
+  - `tryCJKWeekdayModifier()` - Specialized handler for CJK weekday modifiers
+  - Sorts weekdays by length (longest first) to ensure correct matching
+  - Calculates target dates by finding start of week and adding appropriate offsets
+
+### Changed
+- **Test Suite**:
+  - 12 new test cases for CJK weekday modifiers (6 Japanese + 6 Chinese)
+  - All 950+ existing tests still passing
+  - `parser_relative.go` - Enhanced to support CJK-specific patterns
+
+### Fixed
+- Week boundary interpretation now correctly calculates "last week Monday" as Monday of the previous calendar week
+
+### Summary
+- CJK languages (Chinese and Japanese) now have full feature parity with Romance languages for complex weekday modifier patterns
+
+## [1.3.2] - 2025-10-02
+
+### Added
+- **Chinese Simplified Language Support (zh-Hans)**: Comprehensive Simplified Chinese date parsing
+  - Months: `一月`, `二月`, ..., `十二月` (with numeric variants: `1月`, `2月`, etc.)
+  - Weekdays: `星期一`, `周一`, `礼拜一` (three variations for each weekday)
+  - Simple relative: `昨天` (yesterday), `今天` (today), `明天` (tomorrow)
+  - Ago patterns: `1天前` (1 day ago), `2周前` (2 weeks ago) - no-space CJK format
+  - Future patterns: `1天后` (in 1 day), `2周后` (in 2 weeks) - no-space CJK format
+  - Next/last: `下周` (next week), `上月` (last month)
+  - CJK date format: `2024年12月31日` (YYYY年MM月DD日)
+  - Time expressions: `中午` (noon), `午夜` (midnight)
+  - Alternative weekday forms: `礼拜一`, `星期天`, `周天`
+
+- **Japanese Language Support (ja-JP)**: Comprehensive Japanese date parsing
+  - Months: `一月`, `二月`, ..., `十二月` (with numeric variants: `1月`, `2月`, etc.)
+  - Weekdays: `月曜日`, `火曜日`, ..., `日曜日` (with short forms: `月曜`, `火曜`, etc.)
+  - Simple relative: `昨日` (yesterday), `今日` (today), `明日` (tomorrow)
+  - Ago patterns: `1日前` (1 day ago), `2週前` (2 weeks ago), `1ヶ月前` (1 month ago) - no-space format
+  - Future patterns: `1日後` (in 1 day), `2週後` (in 2 weeks) - no-space format
+  - Next/last: `来週` (next week), `先月` (last month)
+  - CJK date format: `2024年12月31日` (YYYY年MM月DD日 - same as Chinese)
+  - Time expressions: `正午` (noon), `真夜中` (midnight)
+
+- **CJK-Specific Parser Enhancements**:
+  - `parseCJKDate()` function for `YYYY年MM月DD日` format (shared by Chinese and Japanese)
+  - Enhanced `tryParseAgoSuffixPattern()` to support no-space CJK patterns like `3日前`
+  - Enhanced `tryParseInPattern()` to support no-space CJK patterns like `3日後`
+  - Enhanced `tryParseNextPattern()` to support no-space CJK patterns like `来週`
+  - Enhanced `tryParseLastPattern()` to support no-space CJK patterns like `先週`
+  - Pattern matching adjusted for languages without spaces between units and modifiers
+
+- **New Files**:
+  - `translations/chinese.go` - Chinese Simplified language implementation
+  - `translations/japanese.go` - Japanese language implementation
+  - `chinese_test.go` - Comprehensive Chinese test suite
+  - `japanese_test.go` - Comprehensive Japanese test suite
+  - `examples/chinese_demo.go` - Chinese parsing demonstration
+  - `examples/japanese_demo.go` - Japanese parsing demonstration
+
+### Changed
+- **Test Suite**:
+  - 950+ test cases total (up from 600+)
+  - Support for 7 languages: English, Spanish, Portuguese, French, German, Chinese, Japanese
+  - `translations/registry.go` - Added Chinese and Japanese to global registry
+  - `parser_absolute.go` - Added CJK date format pattern
+  - `parser_relative.go` - Enhanced for CJK no-space relative patterns
+
+### Summary
+- Comprehensive support for **7 languages**: English, Spanish, Portuguese, French, German, Chinese Simplified, Japanese
+- Full CJK language support with culturally-appropriate date formats and patterns
+- CJK languages have feature parity with Romance languages for most patterns
+
 ## [1.3.1] - 2025-10-02
 
 ### Added

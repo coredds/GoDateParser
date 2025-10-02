@@ -10,6 +10,9 @@ import (
 	"github.com/coredds/godateparser/translations"
 )
 
+// Version is the current version of the godateparser library
+const Version = "1.3.3"
+
 // Settings defines customizable parsing behavior for date parsing operations.
 type Settings struct {
 	// DateOrder specifies the date component order preference: "YMD", "MDY", or "DMY"

@@ -108,7 +108,8 @@ func ParseDate(input string, opts *Settings) (time.Time, error) {
 
 	// 1. Try timestamp parser
 	if isParserEnabled(settings, "timestamp") {
-		if result, err := parseTimestamp(ctx); err == nil {
+		result, err := parseTimestamp(ctx)
+		if err == nil {
 			return result, nil
 		}
 		// Check if it's a specific error type that should be returned as-is
@@ -120,7 +121,8 @@ func ParseDate(input string, opts *Settings) (time.Time, error) {
 
 	// 2. Try absolute date parser
 	if isParserEnabled(settings, "absolute") {
-		if result, err := parseAbsolute(ctx); err == nil {
+		result, err := parseAbsolute(ctx)
+		if err == nil {
 			return result, nil
 		}
 		// Check if it's a specific error type that should be returned as-is
@@ -132,7 +134,8 @@ func ParseDate(input string, opts *Settings) (time.Time, error) {
 
 	// 3. Try relative date parser
 	if isParserEnabled(settings, "relative") {
-		if result, err := parseRelative(ctx); err == nil {
+		result, err := parseRelative(ctx)
+		if err == nil {
 			return result, nil
 		}
 		// Check if it's a specific error type that should be returned as-is
@@ -144,7 +147,8 @@ func ParseDate(input string, opts *Settings) (time.Time, error) {
 
 	// 4. Try time parser (v1.0 Phase 3B)
 	if isParserEnabled(settings, "time") {
-		if result, err := tryParseTime(ctx); err == nil {
+		result, err := tryParseTime(ctx)
+		if err == nil {
 			return result, nil
 		}
 		// Check if it's a specific error type that should be returned as-is
@@ -156,7 +160,8 @@ func ParseDate(input string, opts *Settings) (time.Time, error) {
 
 	// 5. Try incomplete date parser (v1.1 Phase 4)
 	if isParserEnabled(settings, "incomplete") {
-		if result, err := tryParseIncompleteDate(ctx); err == nil {
+		result, err := tryParseIncompleteDate(ctx)
+		if err == nil {
 			return result, nil
 		}
 		// Check if it's a specific error type that should be returned as-is
@@ -168,7 +173,8 @@ func ParseDate(input string, opts *Settings) (time.Time, error) {
 
 	// 6. Try ordinal date parser (v1.1 Phase 4)
 	if isParserEnabled(settings, "ordinal") {
-		if result, err := tryParseOrdinalDate(ctx); err == nil {
+		result, err := tryParseOrdinalDate(ctx)
+		if err == nil {
 			return result, nil
 		}
 		// Check if it's a specific error type that should be returned as-is
@@ -180,7 +186,8 @@ func ParseDate(input string, opts *Settings) (time.Time, error) {
 
 	// 7. Try week number parser (v1.2 Phase 5)
 	if isParserEnabled(settings, "week") {
-		if result, err := tryParseWeekNumber(ctx); err == nil {
+		result, err := tryParseWeekNumber(ctx)
+		if err == nil {
 			return result, nil
 		}
 		// Check if it's a specific error type that should be returned as-is

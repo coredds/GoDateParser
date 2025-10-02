@@ -351,23 +351,22 @@ func tryParseMultiLangMonthName(ctx *parserContext, input string) (time.Time, er
 			continue
 		}
 
-			// Handle 2-digit years
-			if year < 100 {
-				year = parseTwoDigitYear(year)
-			}
-
-			if month == 0 {
-				continue
-			}
-
-			// Validate date components
-			if err := validateDateComponents(year, int(month), day); err != nil {
-				return time.Time{}, err
-			}
-
-			loc := ctx.settings.PreferredTimezone
-			return time.Date(year, month, day, 0, 0, 0, 0, loc), nil
+		// Handle 2-digit years
+		if year < 100 {
+			year = parseTwoDigitYear(year)
 		}
+
+		if month == 0 {
+			continue
+		}
+
+		// Validate date components
+		if err := validateDateComponents(year, int(month), day); err != nil {
+			return time.Time{}, err
+		}
+
+		loc := ctx.settings.PreferredTimezone
+		return time.Date(year, month, day, 0, 0, 0, 0, loc), nil
 	}
 
 	return time.Time{}, fmt.Errorf("no multi-language month pattern matched")

@@ -3,6 +3,7 @@ package godateparser
 import (
 	"fmt"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -380,16 +381,11 @@ func tryParseNextPattern(ctx *parserContext, input string, lang *translations.La
 			}
 		}
 
-		// Try CJK pattern for weekdays: "来週月曜日" - next term + weekday (no space)
-		patternCJKWeekday := fmt.Sprintf(`^%s(%s)$`, regexp.QuoteMeta(strings.ToLower(nextTerm)), weekdayPattern)
-		reCJKWeekday := regexp.MustCompile(patternCJKWeekday)
-
-		if matches := reCJKWeekday.FindStringSubmatch(input); matches != nil {
-			if weekday, ok := lang.Weekdays[matches[1]]; ok {
-				// Find next week's occurrence of this weekday
-				nextWeek := ctx.settings.RelativeBase.AddDate(0, 0, 7)
-				return findWeekday(nextWeek, weekday, true), nil
-			}
+		// Try CJK pattern for weekdays: "来週月曜" - next term + unit + weekday (no space)
+		// This is complex because we need to match the longest weekday first
+		// e.g., "来週月曜" should match "来"+"週"+"月曜", not "来"+"週月"+"曜"
+		if result, err := tryCJKWeekdayModifier(ctx, input, lang, nextTerm, true); err == nil {
+			return result, nil
 		}
 	}
 
@@ -433,16 +429,10 @@ func tryParseLastPattern(ctx *parserContext, input string, lang *translations.La
 			}
 		}
 
-		// Try CJK pattern for weekdays: "先週月曜日" - last term + weekday (no space)
-		patternCJKWeekday := fmt.Sprintf(`^%s(%s)$`, regexp.QuoteMeta(strings.ToLower(lastTerm)), weekdayPattern)
-		reCJKWeekday := regexp.MustCompile(patternCJKWeekday)
-
-		if matches := reCJKWeekday.FindStringSubmatch(input); matches != nil {
-			if weekday, ok := lang.Weekdays[matches[1]]; ok {
-				// Find last week's occurrence of this weekday
-				lastWeek := ctx.settings.RelativeBase.AddDate(0, 0, -7)
-				return findWeekday(lastWeek, weekday, false), nil
-			}
+		// Try CJK pattern for weekdays: "先週月曜" - last term + unit + weekday (no space)
+		// This is complex because we need to match the longest weekday first
+		if result, err := tryCJKWeekdayModifier(ctx, input, lang, lastTerm, false); err == nil {
+			return result, nil
 		}
 	}
 
@@ -570,4 +560,114 @@ func normalizeTimeUnit(unit string, lang *translations.Language) string {
 	}
 
 	return unit
+}
+
+// tryCJKWeekdayModifier handles CJK patterns like "来週月曜" (next week Monday)
+// This is complex because we need to match the longest weekday first to avoid
+// ambiguity with time unit characters (e.g., "月" can be "month" or part of "月曜" Monday)
+func tryCJKWeekdayModifier(ctx *parserContext, input string, lang *translations.Language, modifierTerm string, isNext bool) (time.Time, error) {
+	// Build time unit pattern
+	units := buildTimeUnitPattern(lang)
+	if units == "" {
+		return time.Time{}, fmt.Errorf("no time units")
+	}
+
+	// The input format is: modifier + unit + weekday (all concatenated, no spaces)
+	// e.g., "来週月曜" = "来" (next) + "週" (week) + "月曜" (Monday)
+	
+	// Try to match: modifier + any_characters
+	prefix := strings.ToLower(modifierTerm)
+	if !strings.HasPrefix(input, prefix) {
+		return time.Time{}, fmt.Errorf("no modifier match")
+	}
+
+	// Remove the modifier prefix
+	remainder := input[len(prefix):]
+	if len(remainder) == 0 {
+		return time.Time{}, fmt.Errorf("no remainder after modifier")
+	}
+
+	// Now we need to find a time unit followed by a weekday
+	// Strategy: Try to match weekdays from longest to shortest
+	// This ensures "月曜" matches before "月" alone
+	
+	// Get all weekdays sorted by length (longest first)
+	type weekdayMatch struct {
+		name    string
+		weekday time.Weekday
+	}
+	var weekdays []weekdayMatch
+	for name, wd := range lang.Weekdays {
+		weekdays = append(weekdays, weekdayMatch{name: name, weekday: wd})
+	}
+	
+	// Sort by length descending
+	sort.Slice(weekdays, func(i, j int) bool {
+		return len(weekdays[i].name) > len(weekdays[j].name)
+	})
+
+	// Try each weekday to see if the remainder ends with it
+	for _, wdMatch := range weekdays {
+		if strings.HasSuffix(remainder, wdMatch.name) {
+			// Found a weekday at the end
+			// The middle part should be a time unit
+			unitPart := remainder[:len(remainder)-len(wdMatch.name)]
+			
+			// Verify this is a valid time unit
+			unit := normalizeTimeUnit(unitPart, lang)
+			
+			// For weekday modifiers, we only support week/month as the unit
+			if unit == "week" || unit == "month" {
+				// Calculate the target date
+				// For "next week Monday", we want Monday of the next calendar week
+				// For "last week Monday", we want Monday of the last calendar week
+				if isNext {
+					// Next week/month
+					if unit == "week" {
+						// Find Monday of next week first (start of next week)
+						daysToMonday := int(time.Monday - ctx.settings.RelativeBase.Weekday())
+						if daysToMonday <= 0 {
+							daysToMonday += 7
+						}
+						startOfNextWeek := ctx.settings.RelativeBase.AddDate(0, 0, daysToMonday)
+						
+						// Now find the target weekday within that week
+						daysFromMonday := int(wdMatch.weekday - time.Monday)
+						if daysFromMonday < 0 {
+							daysFromMonday += 7
+						}
+						return startOfNextWeek.AddDate(0, 0, daysFromMonday), nil
+					} else { // month
+						baseDate := ctx.settings.RelativeBase.AddDate(0, 1, 0)
+						return findWeekday(baseDate, wdMatch.weekday, true), nil
+					}
+				} else {
+					// Last week/month
+					if unit == "week" {
+						// Find Monday of this week
+						daysFromMonday := int(ctx.settings.RelativeBase.Weekday() - time.Monday)
+						if daysFromMonday < 0 {
+							daysFromMonday += 7
+						}
+						startOfThisWeek := ctx.settings.RelativeBase.AddDate(0, 0, -daysFromMonday)
+						
+						// Go back 7 days to get Monday of last week
+						startOfLastWeek := startOfThisWeek.AddDate(0, 0, -7)
+						
+						// Now find the target weekday within last week
+						daysToTarget := int(wdMatch.weekday - time.Monday)
+						if daysToTarget < 0 {
+							daysToTarget += 7
+						}
+						return startOfLastWeek.AddDate(0, 0, daysToTarget), nil
+					} else { // month
+						baseDate := ctx.settings.RelativeBase.AddDate(0, -1, 0)
+						return findWeekday(baseDate, wdMatch.weekday, false), nil
+					}
+				}
+			}
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("no CJK weekday modifier match")
 }

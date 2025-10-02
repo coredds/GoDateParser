@@ -237,10 +237,41 @@ func TestChinese_RelativeNextLast(t *testing.T) {
 }
 
 func TestChinese_WeekdaysWithModifiers(t *testing.T) {
-	// Note: Patterns like "下周一" (next week Monday) are complex because
-	// the parser needs to distinguish between "周" (week unit) and "周一" (week+monday).
-	// This requires more sophisticated tokenization and is planned for future implementation.
-	t.Skip("Chinese weekday modifiers (下周一, 上周一) require advanced tokenization - not yet implemented")
+	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC) // Saturday
+	settings := &Settings{
+		RelativeBase: refTime,
+		Languages:    []string{"zh", "en"},
+	}
+
+	tests := []struct {
+		name        string
+		input       string
+		wantWeekday time.Weekday
+		wantDay     int
+	}{
+		{"下周一", "下周一", time.Monday, 17},    // Next week Monday (using 周) - June 17-23
+		{"上周一", "上周一", time.Monday, 3},     // Last week Monday (using 周) - June 3-9
+		{"下周五", "下周五", time.Friday, 21},   // Next week Friday
+		{"上周五", "上周五", time.Friday, 7},    // Last week Friday
+		{"下星期一", "下星期一", time.Monday, 17}, // Next week Monday (using 星期)
+		{"上星期五", "上星期五", time.Friday, 7}, // Last week Friday (using 星期)
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := ParseDate(tt.input, settings)
+			if err != nil {
+				t.Errorf("ParseDate() error = %v", err)
+				return
+			}
+			if result.Weekday() != tt.wantWeekday {
+				t.Errorf("Weekday = %v, want %v", result.Weekday(), tt.wantWeekday)
+			}
+			if result.Day() != tt.wantDay {
+				t.Errorf("Day = %v, want %v", result.Day(), tt.wantDay)
+			}
+		})
+	}
 }
 
 func TestChinese_TimeExpressions(t *testing.T) {

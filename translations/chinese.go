@@ -25,7 +25,7 @@ func NewChineseTranslation() *Language {
 			"十二月": time.December, "12月": time.December,
 		},
 		Weekdays: map[string]time.Weekday{
-			// Full names
+			// Full names with different prefixes
 			"星期一": time.Monday, "周一": time.Monday, "礼拜一": time.Monday,
 			"星期二": time.Tuesday, "周二": time.Tuesday, "礼拜二": time.Tuesday,
 			"星期三": time.Wednesday, "周三": time.Wednesday, "礼拜三": time.Wednesday,
@@ -33,6 +33,14 @@ func NewChineseTranslation() *Language {
 			"星期五": time.Friday, "周五": time.Friday, "礼拜五": time.Friday,
 			"星期六": time.Saturday, "周六": time.Saturday, "礼拜六": time.Saturday,
 			"星期日": time.Sunday, "星期天": time.Sunday, "周日": time.Sunday, "周天": time.Sunday, "礼拜日": time.Sunday, "礼拜天": time.Sunday,
+			// Short forms (just the number) for use in compound expressions like "下周一" (next week Monday)
+			"一": time.Monday,
+			"二": time.Tuesday,
+			"三": time.Wednesday,
+			"四": time.Thursday,
+			"五": time.Friday,
+			"六": time.Saturday,
+			"日": time.Sunday, "天": time.Sunday,
 		},
 		RelativeTerms: &RelativeTerms{
 			Yesterday: "昨天",

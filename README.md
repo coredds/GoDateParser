@@ -731,6 +731,12 @@ godateparser.ParseDate("1个月前", settings)         // 1 month ago
 godateparser.ParseDate("下周", settings)             // next week
 godateparser.ParseDate("上月", settings)             // last month
 
+// Weekday modifiers - next/last week with specific weekday
+godateparser.ParseDate("下周一", settings)           // next week Monday (using 周)
+godateparser.ParseDate("上周五", settings)           // last week Friday (using 周)
+godateparser.ParseDate("下星期一", settings)         // next week Monday (using 星期)
+```
+
 ### Japanese (ja) Examples
 
 ```go
@@ -780,7 +786,14 @@ godateparser.ParseDate("1ヶ月前", settings)         // 1 month ago
 
 // Next/Last patterns
 godateparser.ParseDate("来週", settings)             // next week (raishuu)
+godateparser.ParseDate("先週", settings)             // last week (senshuu)
+godateparser.ParseDate("来月", settings)             // next month (raigetsu)
 godateparser.ParseDate("先月", settings)             // last month (sengetsu)
+
+// Weekday modifiers - next/last week with specific weekday
+godateparser.ParseDate("来週月曜", settings)         // next week Monday (raishuu getsuyou)
+godateparser.ParseDate("先週金曜", settings)         // last week Friday (senshuu kinyou)
+godateparser.ParseDate("来週月曜日", settings)       // next week Monday (with 日 suffix)
 
 #### Mixed Language Usage
 

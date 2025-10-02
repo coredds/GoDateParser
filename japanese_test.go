@@ -240,10 +240,41 @@ func TestJapanese_RelativeNextLast(t *testing.T) {
 }
 
 func TestJapanese_WeekdaysWithModifiers(t *testing.T) {
-	// Note: Patterns like "来週月曜" (next week Monday) are complex because
-	// the parser needs to distinguish between "週" (week unit) and "週月曜" (week+monday).
-	// This requires more sophisticated tokenization and is planned for future implementation.
-	t.Skip("Japanese weekday modifiers (来週月曜, 先週金曜) require advanced tokenization - not yet implemented")
+	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC) // Saturday
+	settings := &Settings{
+		RelativeBase: refTime,
+		Languages:    []string{"ja", "en"},
+	}
+
+	tests := []struct {
+		name        string
+		input       string
+		wantWeekday time.Weekday
+		wantDay     int
+	}{
+		{"来週月曜", "来週月曜", time.Monday, 17},    // Next week Monday (June 17-23)
+		{"先週月曜", "先週月曜", time.Monday, 3},     // Last week Monday (June 3-9)
+		{"来週金曜", "来週金曜", time.Friday, 21},   // Next week Friday
+		{"先週金曜", "先週金曜", time.Friday, 7},    // Last week Friday
+		{"来週月曜日", "来週月曜日", time.Monday, 17}, // With 日 suffix
+		{"先週金曜日", "先週金曜日", time.Friday, 7}, // With 日 suffix
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := ParseDate(tt.input, settings)
+			if err != nil {
+				t.Errorf("ParseDate() error = %v", err)
+				return
+			}
+			if result.Weekday() != tt.wantWeekday {
+				t.Errorf("Weekday = %v, want %v", result.Weekday(), tt.wantWeekday)
+			}
+			if result.Day() != tt.wantDay {
+				t.Errorf("Day = %v, want %v", result.Day(), tt.wantDay)
+			}
+		})
+	}
 }
 
 func TestJapanese_TimeExpressions(t *testing.T) {

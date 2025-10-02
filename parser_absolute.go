@@ -13,6 +13,12 @@ import (
 
 // Common absolute date patterns
 var absolutePatterns = []*absolutePattern{
+	// Japanese/Chinese date format: 2024年12月31日
+	{
+		regex:  regexp.MustCompile(`^(\d{4})年(\d{1,2})月(\d{1,2})日$`),
+		format: "YMD",
+		parser: parseCJKDate,
+	},
 	// ISO 8601: 2024-12-31, 2024-12-31T10:30:00
 	{
 		regex:  regexp.MustCompile(`(?i)^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T\s](\d{1,2}):(\d{1,2})(?::(\d{1,2}))?)?`),
@@ -94,6 +100,23 @@ func parseAbsolute(ctx *parserContext) (time.Time, error) {
 	}
 
 	return time.Time{}, fmt.Errorf("no absolute date pattern matched")
+}
+
+// parseCJKDate handles Japanese/Chinese date format (YYYY年MM月DD日).
+func parseCJKDate(ctx *parserContext, matches []string) (time.Time, error) {
+	year, _ := strconv.Atoi(matches[1])
+	month, _ := strconv.Atoi(matches[2])
+	day, _ := strconv.Atoi(matches[3])
+
+	// Validate date components
+	if err := validateDateComponents(year, month, day); err != nil {
+		return time.Time{}, err
+	}
+
+	loc := ctx.settings.PreferredTimezone
+	date := time.Date(year, time.Month(month), day, 0, 0, 0, 0, loc)
+
+	return date, nil
 }
 
 // parseISO8601 handles ISO 8601 format dates.

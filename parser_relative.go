@@ -287,11 +287,22 @@ func tryParseAgoSuffixPattern(ctx *parserContext, input string, lang *translatio
 		return time.Time{}, fmt.Errorf("no time units")
 	}
 
-	// Pattern: "2 días atrás" - number FIRST, unit SECOND, ago term LAST
+	// Pattern: "2 días atrás" - number FIRST, unit SECOND, ago term LAST (with space)
 	pattern := fmt.Sprintf(`^(\d+)\s+(%s)\s+%s$`, units, regexp.QuoteMeta(strings.ToLower(agoTerm)))
 	re := regexp.MustCompile(pattern)
 
 	if matches := re.FindStringSubmatch(input); matches != nil {
+		amount, _ := strconv.Atoi(matches[1])
+		unit := normalizeTimeUnit(matches[2], lang)
+		return addDuration(ctx.settings.RelativeBase, -amount, unit), nil
+	}
+
+	// Pattern for CJK languages (Japanese/Chinese): "3日前" - number + unit + marker (no space)
+	// This handles patterns like 3日前, 2週前, 1ヶ月前
+	patternCJK := fmt.Sprintf(`^(\d+)(%s)%s$`, units, regexp.QuoteMeta(strings.ToLower(agoTerm)))
+	reCJK := regexp.MustCompile(patternCJK)
+
+	if matches := reCJK.FindStringSubmatch(input); matches != nil {
 		amount, _ := strconv.Atoi(matches[1])
 		unit := normalizeTimeUnit(matches[2], lang)
 		return addDuration(ctx.settings.RelativeBase, -amount, unit), nil
@@ -308,10 +319,22 @@ func tryParseInPattern(ctx *parserContext, input string, lang *translations.Lang
 		return time.Time{}, fmt.Errorf("no time units")
 	}
 
+	// Pattern: "en 3 semanas" - in term FIRST, number SECOND, unit LAST
 	pattern := fmt.Sprintf(`^%s\s+(\d+)\s+(%s)$`, regexp.QuoteMeta(strings.ToLower(inTerm)), units)
 	re := regexp.MustCompile(pattern)
 
 	if matches := re.FindStringSubmatch(input); matches != nil {
+		amount, _ := strconv.Atoi(matches[1])
+		unit := normalizeTimeUnit(matches[2], lang)
+		return addDuration(ctx.settings.RelativeBase, amount, unit), nil
+	}
+
+	// Pattern for CJK languages (Japanese/Chinese): "3日後" - number + unit + marker (no space)
+	// This handles patterns like 3日後, 2週後, 1ヶ月後
+	patternCJK := fmt.Sprintf(`^(\d+)(%s)%s$`, units, regexp.QuoteMeta(strings.ToLower(inTerm)))
+	reCJK := regexp.MustCompile(patternCJK)
+
+	if matches := reCJK.FindStringSubmatch(input); matches != nil {
 		amount, _ := strconv.Atoi(matches[1])
 		unit := normalizeTimeUnit(matches[2], lang)
 		return addDuration(ctx.settings.RelativeBase, amount, unit), nil
@@ -322,7 +345,7 @@ func tryParseInPattern(ctx *parserContext, input string, lang *translations.Lang
 
 // tryParseNextPattern parses patterns like "próxima semana" (next week)
 func tryParseNextPattern(ctx *parserContext, input string, lang *translations.Language, nextTerm string) (time.Time, error) {
-	// Try "next [unit]" patterns
+	// Try "next [unit]" patterns (with space)
 	units := buildTimeUnitPattern(lang)
 	if units == "" {
 		return time.Time{}, fmt.Errorf("no time units")
@@ -336,7 +359,16 @@ func tryParseNextPattern(ctx *parserContext, input string, lang *translations.La
 		return addDuration(ctx.settings.RelativeBase, 1, unit), nil
 	}
 
-	// Try "next [weekday]" patterns
+	// Try CJK pattern "来週" - next term + unit (no space)
+	patternCJK := fmt.Sprintf(`^%s(%s)$`, regexp.QuoteMeta(strings.ToLower(nextTerm)), units)
+	reCJK := regexp.MustCompile(patternCJK)
+
+	if matches := reCJK.FindStringSubmatch(input); matches != nil {
+		unit := normalizeTimeUnit(matches[1], lang)
+		return addDuration(ctx.settings.RelativeBase, 1, unit), nil
+	}
+
+	// Try "next [weekday]" patterns (with space)
 	weekdayPattern := buildWeekdayPattern(lang)
 	if weekdayPattern != "" {
 		pattern := fmt.Sprintf(`^%s\s+(%s)$`, regexp.QuoteMeta(strings.ToLower(nextTerm)), weekdayPattern)
@@ -347,6 +379,18 @@ func tryParseNextPattern(ctx *parserContext, input string, lang *translations.La
 				return findWeekday(ctx.settings.RelativeBase, weekday, true), nil
 			}
 		}
+
+		// Try CJK pattern for weekdays: "来週月曜日" - next term + weekday (no space)
+		patternCJKWeekday := fmt.Sprintf(`^%s(%s)$`, regexp.QuoteMeta(strings.ToLower(nextTerm)), weekdayPattern)
+		reCJKWeekday := regexp.MustCompile(patternCJKWeekday)
+
+		if matches := reCJKWeekday.FindStringSubmatch(input); matches != nil {
+			if weekday, ok := lang.Weekdays[matches[1]]; ok {
+				// Find next week's occurrence of this weekday
+				nextWeek := ctx.settings.RelativeBase.AddDate(0, 0, 7)
+				return findWeekday(nextWeek, weekday, true), nil
+			}
+		}
 	}
 
 	return time.Time{}, fmt.Errorf("no match")
@@ -354,7 +398,7 @@ func tryParseNextPattern(ctx *parserContext, input string, lang *translations.La
 
 // tryParseLastPattern parses patterns like "última semana" (last week)
 func tryParseLastPattern(ctx *parserContext, input string, lang *translations.Language, lastTerm string) (time.Time, error) {
-	// Try "last [unit]" patterns
+	// Try "last [unit]" patterns (with space)
 	units := buildTimeUnitPattern(lang)
 	if units == "" {
 		return time.Time{}, fmt.Errorf("no time units")
@@ -368,7 +412,16 @@ func tryParseLastPattern(ctx *parserContext, input string, lang *translations.La
 		return addDuration(ctx.settings.RelativeBase, -1, unit), nil
 	}
 
-	// Try "last [weekday]" patterns
+	// Try CJK pattern "先週" - last term + unit (no space)
+	patternCJK := fmt.Sprintf(`^%s(%s)$`, regexp.QuoteMeta(strings.ToLower(lastTerm)), units)
+	reCJK := regexp.MustCompile(patternCJK)
+
+	if matches := reCJK.FindStringSubmatch(input); matches != nil {
+		unit := normalizeTimeUnit(matches[1], lang)
+		return addDuration(ctx.settings.RelativeBase, -1, unit), nil
+	}
+
+	// Try "last [weekday]" patterns (with space)
 	weekdayPattern := buildWeekdayPattern(lang)
 	if weekdayPattern != "" {
 		pattern := fmt.Sprintf(`^%s\s+(%s)$`, regexp.QuoteMeta(strings.ToLower(lastTerm)), weekdayPattern)
@@ -377,6 +430,18 @@ func tryParseLastPattern(ctx *parserContext, input string, lang *translations.La
 		if matches := re.FindStringSubmatch(input); matches != nil {
 			if weekday, ok := lang.Weekdays[matches[1]]; ok {
 				return findWeekday(ctx.settings.RelativeBase, weekday, false), nil
+			}
+		}
+
+		// Try CJK pattern for weekdays: "先週月曜日" - last term + weekday (no space)
+		patternCJKWeekday := fmt.Sprintf(`^%s(%s)$`, regexp.QuoteMeta(strings.ToLower(lastTerm)), weekdayPattern)
+		reCJKWeekday := regexp.MustCompile(patternCJKWeekday)
+
+		if matches := reCJKWeekday.FindStringSubmatch(input); matches != nil {
+			if weekday, ok := lang.Weekdays[matches[1]]; ok {
+				// Find last week's occurrence of this weekday
+				lastWeek := ctx.settings.RelativeBase.AddDate(0, 0, -7)
+				return findWeekday(lastWeek, weekday, false), nil
 			}
 		}
 	}

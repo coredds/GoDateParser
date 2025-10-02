@@ -138,16 +138,67 @@ func main() {
 		fmt.Printf("%-10s → %s\n", input, lang)
 	}
 
+	// Chinese date formats
+	fmt.Println("\n--- Chinese Date Formats (YYYY年MM月DD日) ---")
+	dateFormats := []string{
+		"2024年12月31日",
+		"2025年1月1日",
+		"2024年10月15日",
+	}
+	for _, input := range dateFormats {
+		result, err := godateparser.ParseDate(input, settings)
+		if err != nil {
+			fmt.Printf("✗ %s: %v\n", input, err)
+		} else {
+			fmt.Printf("✓ %-20s → %s\n", input, result.Format("2006-01-02"))
+		}
+	}
+
+	// Relative patterns with numbers
+	fmt.Println("\n--- Relative Patterns (N天前, N周后) ---")
+	relativePatterns := []string{
+		"3天前", // 3 days ago
+		"2周后", // in 2 weeks
+		"1个月前", // 1 month ago (note: using ヶ or 个 both work)
+	}
+	for _, input := range relativePatterns {
+		result, err := godateparser.ParseDate(input, settings)
+		if err != nil {
+			fmt.Printf("✗ %s: %v\n", input, err)
+		} else {
+			fmt.Printf("✓ %-12s → %s\n", input, result.Format("2006-01-02"))
+		}
+	}
+
+	// Next/Last patterns
+	fmt.Println("\n--- Next/Last Patterns (下周, 上月) ---")
+	nextLastPatterns := []string{
+		"下周", // next week
+		"上周", // last week
+		"下月", // next month
+		"上月", // last month
+	}
+	for _, input := range nextLastPatterns {
+		result, err := godateparser.ParseDate(input, settings)
+		if err != nil {
+			fmt.Printf("✗ %s: %v\n", input, err)
+		} else {
+			fmt.Printf("✓ %-8s → %s\n", input, result.Format("2006-01-02"))
+		}
+	}
+
 	// Note about Chinese date formats
-	fmt.Println("\n--- Note ---")
-	fmt.Println("Chinese Simplified (zh-Hans) support is now available!")
-	fmt.Println("Current support includes:")
+	fmt.Println("\n--- Summary ---")
+	fmt.Println("Chinese Simplified (zh-Hans) support is now comprehensive!")
+	fmt.Println("Supported features:")
 	fmt.Println("  ✓ Weekdays: 星期一-日, 周一-日, 礼拜一-日")
 	fmt.Println("  ✓ Simple relative: 昨天, 今天, 明天")
 	fmt.Println("  ✓ Months: 1月-12月")
+	fmt.Println("  ✓ Date format: 2024年12月31日 (YYYY年MM月DD日)")
+	fmt.Println("  ✓ Relative patterns: 3天前, 2周后, 1个月前")
+	fmt.Println("  ✓ Next/last: 下周, 上周, 下月, 上月")
 	fmt.Println("  ✓ Time terms: 中午, 午夜")
-	fmt.Println("\nPatterns requiring custom parser (coming soon):")
-	fmt.Println("  • Chinese date format: 2024年12月31日")
-	fmt.Println("  • Relative patterns: 1天前, 2周后, 下周, 上个月")
-	fmt.Println("  • Modified weekdays: 下周一, 上周五")
+	fmt.Println("\nAdvanced patterns (planned for future):")
+	fmt.Println("  • Combined weekday modifiers: 下周一 (next Monday)")
+	fmt.Println("  • (requires advanced tokenization)")
 }

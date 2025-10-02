@@ -392,8 +392,8 @@ godateparser supports multiple languages with automatic detection or explicit se
 - **Portuguese (pt)**: Full support for all features (Brazilian Portuguese)
 - **French (fr)**: Full support for all features (France)
 - **German (de)**: Full support for all features (Germany)
-- **Chinese Simplified (zh)**: Core support for weekdays, months, simple relative dates, and time expressions
-- **Japanese (ja)**: Core support for weekdays, months, simple relative dates, and time expressions
+- **Chinese Simplified (zh)**: Full support including YYYY年MM月DD日 format, relative patterns (3天前, 2周后), next/last (下周, 上月)
+- **Japanese (ja)**: Full support including YYYY年MM月DD日 format, relative patterns (3日前, 2週後), next/last (来週, 先月)
 
 ### Language Selection
 
@@ -718,7 +718,18 @@ godateparser.ParseDate("昨天", settings)          // Chinese: yesterday
 godateparser.ParseDate("yesterday", settings)    // English: yesterday
 ```
 
-**Note**: Chinese date format patterns like "2024年12月31日" and relative expressions like "1天前" (1 day ago), "下周" (next week) require custom parser support and are planned for future releases.
+// Chinese date formats
+godateparser.ParseDate("2024年12月31日", settings)  // 2024-12-31
+godateparser.ParseDate("2025年1月1日", settings)    // 2025-01-01
+
+// Relative patterns with numbers
+godateparser.ParseDate("3天前", settings)           // 3 days ago
+godateparser.ParseDate("2周后", settings)           // in 2 weeks
+godateparser.ParseDate("1个月前", settings)         // 1 month ago
+
+// Next/Last patterns
+godateparser.ParseDate("下周", settings)             // next week
+godateparser.ParseDate("上月", settings)             // last month
 
 ### Japanese (ja) Examples
 
@@ -758,7 +769,18 @@ godateparser.ParseDate("昨日", settings)          // Japanese: yesterday
 godateparser.ParseDate("yesterday", settings)    // English: yesterday
 ```
 
-**Note**: Japanese date format patterns like "2024年12月31日" and relative expressions like "3日前" (3 days ago), "来週" (next week) require custom parser support and are planned for future releases.
+// Japanese date formats
+godateparser.ParseDate("2024年12月31日", settings)  // 2024-12-31 (same as Chinese!)
+godateparser.ParseDate("2025年1月1日", settings)    // 2025-01-01
+
+// Relative patterns with numbers
+godateparser.ParseDate("3日前", settings)           // 3 days ago (mikka mae)
+godateparser.ParseDate("2週後", settings)           // in 2 weeks (ni shuu go)
+godateparser.ParseDate("1ヶ月前", settings)         // 1 month ago
+
+// Next/Last patterns
+godateparser.ParseDate("来週", settings)             // next week (raishuu)
+godateparser.ParseDate("先月", settings)             // last month (sengetsu)
 
 #### Mixed Language Usage
 

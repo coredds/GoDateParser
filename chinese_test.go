@@ -125,27 +125,122 @@ func TestChinese_RelativeSimple(t *testing.T) {
 }
 
 func TestChinese_RelativeAgo(t *testing.T) {
-	// Note: Chinese patterns like "1天前" require custom parser support
-	// Skipping this test for now as it needs pattern-specific implementation
-	t.Skip("Chinese 'ago' patterns (天前, 周前) require custom parser - not yet implemented")
+	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
+	settings := &Settings{
+		RelativeBase: refTime,
+		Languages:    []string{"zh", "en"},
+	}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantYear int
+		wantDay  int
+	}{
+		{"1天前", "1天前", 2024, 14},
+		{"2天前", "2天前", 2024, 13},
+		{"1周前", "1周前", 2024, 8},
+		{"2周前", "2周前", 2024, 1},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := ParseDate(tt.input, settings)
+			if err != nil {
+				t.Errorf("ParseDate() error = %v", err)
+				return
+			}
+			if result.Year() != tt.wantYear {
+				t.Errorf("Year = %v, want %v", result.Year(), tt.wantYear)
+			}
+			if result.Day() != tt.wantDay {
+				t.Errorf("Day = %v, want %v", result.Day(), tt.wantDay)
+			}
+		})
+	}
 }
 
 func TestChinese_RelativeIn(t *testing.T) {
-	// Note: Chinese patterns like "1天后" require custom parser support
-	// Skipping this test for now as it needs pattern-specific implementation
-	t.Skip("Chinese 'in' patterns (天后, 周后) require custom parser - not yet implemented")
+	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
+	settings := &Settings{
+		RelativeBase: refTime,
+		Languages:    []string{"zh", "en"},
+	}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantYear int
+		wantDay  int
+	}{
+		{"1天后", "1天后", 2024, 16},
+		{"2天后", "2天后", 2024, 17},
+		{"1周后", "1周后", 2024, 22},
+		{"2周后", "2周后", 2024, 29},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := ParseDate(tt.input, settings)
+			if err != nil {
+				t.Errorf("ParseDate() error = %v", err)
+				return
+			}
+			if result.Year() != tt.wantYear {
+				t.Errorf("Year = %v, want %v", result.Year(), tt.wantYear)
+			}
+			if result.Day() != tt.wantDay {
+				t.Errorf("Day = %v, want %v", result.Day(), tt.wantDay)
+			}
+		})
+	}
 }
 
 func TestChinese_RelativeNextLast(t *testing.T) {
-	// Note: Chinese patterns like "下周", "上周" require custom parser support
-	// Skipping this test for now as it needs pattern-specific implementation
-	t.Skip("Chinese next/last patterns (下周, 上周, 下个月) require custom parser - not yet implemented")
+	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
+	settings := &Settings{
+		RelativeBase: refTime,
+		Languages:    []string{"zh", "en"},
+	}
+
+	tests := []struct {
+		name      string
+		input     string
+		wantYear  int
+		wantMonth time.Month
+		wantDay   int
+	}{
+		{"下周", "下周", 2024, time.June, 22},
+		{"上周", "上周", 2024, time.June, 8},
+		{"下月", "下月", 2024, time.July, 15},  // Using 下月 instead of 下个月
+		{"上月", "上月", 2024, time.May, 15},   // Using 上月 instead of 上个月
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := ParseDate(tt.input, settings)
+			if err != nil {
+				t.Errorf("ParseDate() error = %v", err)
+				return
+			}
+			if result.Year() != tt.wantYear {
+				t.Errorf("Year = %v, want %v", result.Year(), tt.wantYear)
+			}
+			if result.Month() != tt.wantMonth {
+				t.Errorf("Month = %v, want %v", result.Month(), tt.wantMonth)
+			}
+			if result.Day() != tt.wantDay {
+				t.Errorf("Day = %v, want %v", result.Day(), tt.wantDay)
+			}
+		})
+	}
 }
 
 func TestChinese_WeekdaysWithModifiers(t *testing.T) {
-	// Note: Chinese patterns like "下周一", "上周一" require custom parser support
-	// Skipping this test for now as it needs pattern-specific implementation
-	t.Skip("Chinese weekday modifiers (下周一, 上周一) require custom parser - not yet implemented")
+	// Note: Patterns like "下周一" (next week Monday) are complex because
+	// the parser needs to distinguish between "周" (week unit) and "周一" (week+monday).
+	// This requires more sophisticated tokenization and is planned for future implementation.
+	t.Skip("Chinese weekday modifiers (下周一, 上周一) require advanced tokenization - not yet implemented")
 }
 
 func TestChinese_TimeExpressions(t *testing.T) {
@@ -223,9 +318,42 @@ func TestChinese_IncompleteDates(t *testing.T) {
 }
 
 func TestChinese_ChineseSpecific(t *testing.T) {
-	// Note: Chinese date format "YYYY年MM月DD日" requires custom parser support
-	// Skipping this test for now as it needs pattern-specific implementation
-	t.Skip("Chinese date format (年月日) requires custom parser - not yet implemented")
+	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
+	settings := &Settings{
+		RelativeBase: refTime,
+		Languages:    []string{"zh", "en"},
+	}
+
+	tests := []struct {
+		name      string
+		input     string
+		wantYear  int
+		wantMonth time.Month
+		wantDay   int
+	}{
+		{"2024年10月15日", "2024年10月15日", 2024, time.October, 15},
+		{"2024年12月31日", "2024年12月31日", 2024, time.December, 31},
+		{"2025年1月1日", "2025年1月1日", 2025, time.January, 1},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := ParseDate(tt.input, settings)
+			if err != nil {
+				t.Errorf("ParseDate() error = %v", err)
+				return
+			}
+			if result.Year() != tt.wantYear {
+				t.Errorf("Year = %v, want %v", result.Year(), tt.wantYear)
+			}
+			if result.Month() != tt.wantMonth {
+				t.Errorf("Month = %v, want %v", result.Month(), tt.wantMonth)
+			}
+			if result.Day() != tt.wantDay {
+				t.Errorf("Day = %v, want %v", result.Day(), tt.wantDay)
+			}
+		})
+	}
 }
 
 func TestChinese_MixedWithEnglish(t *testing.T) {

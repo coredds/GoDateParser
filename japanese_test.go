@@ -127,27 +127,123 @@ func TestJapanese_RelativeSimple(t *testing.T) {
 }
 
 func TestJapanese_RelativeAgo(t *testing.T) {
-	// Note: Japanese patterns like "3日前" require custom parser support
-	// Skipping this test for now as it needs pattern-specific implementation
-	t.Skip("Japanese 'ago' patterns (日前, 週前) require custom parser - not yet implemented")
+	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
+	settings := &Settings{
+		RelativeBase: refTime,
+		Languages:    []string{"ja", "en"},
+	}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantYear int
+		wantDay  int
+	}{
+		{"1日前", "1日前", 2024, 14},
+		{"2日前", "2日前", 2024, 13},
+		{"1週前", "1週前", 2024, 8},
+		{"2週前", "2週前", 2024, 1},
+		{"1ヶ月前", "1ヶ月前", 2024, 15}, // May 15
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := ParseDate(tt.input, settings)
+			if err != nil {
+				t.Errorf("ParseDate() error = %v", err)
+				return
+			}
+			if result.Year() != tt.wantYear {
+				t.Errorf("Year = %v, want %v", result.Year(), tt.wantYear)
+			}
+			if result.Day() != tt.wantDay {
+				t.Errorf("Day = %v, want %v", result.Day(), tt.wantDay)
+			}
+		})
+	}
 }
 
 func TestJapanese_RelativeIn(t *testing.T) {
-	// Note: Japanese patterns like "3日後" require custom parser support
-	// Skipping this test for now as it needs pattern-specific implementation
-	t.Skip("Japanese 'in' patterns (日後, 週後) require custom parser - not yet implemented")
+	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
+	settings := &Settings{
+		RelativeBase: refTime,
+		Languages:    []string{"ja", "en"},
+	}
+
+	tests := []struct {
+		name     string
+		input    string
+		wantYear int
+		wantDay  int
+	}{
+		{"1日後", "1日後", 2024, 16},
+		{"2日後", "2日後", 2024, 17},
+		{"1週後", "1週後", 2024, 22},
+		{"2週後", "2週後", 2024, 29},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := ParseDate(tt.input, settings)
+			if err != nil {
+				t.Errorf("ParseDate() error = %v", err)
+				return
+			}
+			if result.Year() != tt.wantYear {
+				t.Errorf("Year = %v, want %v", result.Year(), tt.wantYear)
+			}
+			if result.Day() != tt.wantDay {
+				t.Errorf("Day = %v, want %v", result.Day(), tt.wantDay)
+			}
+		})
+	}
 }
 
 func TestJapanese_RelativeNextLast(t *testing.T) {
-	// Note: Japanese patterns like "来週", "先週" require custom parser support
-	// Skipping this test for now as it needs pattern-specific implementation
-	t.Skip("Japanese next/last patterns (来週, 先週, 来月) require custom parser - not yet implemented")
+	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
+	settings := &Settings{
+		RelativeBase: refTime,
+		Languages:    []string{"ja", "en"},
+	}
+
+	tests := []struct {
+		name      string
+		input     string
+		wantYear  int
+		wantMonth time.Month
+		wantDay   int
+	}{
+		{"来週", "来週", 2024, time.June, 22},
+		{"先週", "先週", 2024, time.June, 8},
+		{"来月", "来月", 2024, time.July, 15},
+		{"先月", "先月", 2024, time.May, 15},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := ParseDate(tt.input, settings)
+			if err != nil {
+				t.Errorf("ParseDate() error = %v", err)
+				return
+			}
+			if result.Year() != tt.wantYear {
+				t.Errorf("Year = %v, want %v", result.Year(), tt.wantYear)
+			}
+			if result.Month() != tt.wantMonth {
+				t.Errorf("Month = %v, want %v", result.Month(), tt.wantMonth)
+			}
+			if result.Day() != tt.wantDay {
+				t.Errorf("Day = %v, want %v", result.Day(), tt.wantDay)
+			}
+		})
+	}
 }
 
 func TestJapanese_WeekdaysWithModifiers(t *testing.T) {
-	// Note: Japanese patterns like "来週月曜日", "先週金曜日" require custom parser support
-	// Skipping this test for now as it needs pattern-specific implementation
-	t.Skip("Japanese weekday modifiers (来週月曜日, 先週金曜日) require custom parser - not yet implemented")
+	// Note: Patterns like "来週月曜" (next week Monday) are complex because
+	// the parser needs to distinguish between "週" (week unit) and "週月曜" (week+monday).
+	// This requires more sophisticated tokenization and is planned for future implementation.
+	t.Skip("Japanese weekday modifiers (来週月曜, 先週金曜) require advanced tokenization - not yet implemented")
 }
 
 func TestJapanese_TimeExpressions(t *testing.T) {
@@ -226,9 +322,42 @@ func TestJapanese_IncompleteDates(t *testing.T) {
 }
 
 func TestJapanese_JapaneseSpecific(t *testing.T) {
-	// Note: Japanese date format "YYYY年MM月DD日" requires custom parser support
-	// Skipping this test for now as it needs pattern-specific implementation
-	t.Skip("Japanese date format (年月日) requires custom parser - not yet implemented")
+	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
+	settings := &Settings{
+		RelativeBase: refTime,
+		Languages:    []string{"ja", "en"},
+	}
+
+	tests := []struct {
+		name      string
+		input     string
+		wantYear  int
+		wantMonth time.Month
+		wantDay   int
+	}{
+		{"2024年10月15日", "2024年10月15日", 2024, time.October, 15},
+		{"2024年12月31日", "2024年12月31日", 2024, time.December, 31},
+		{"2025年1月1日", "2025年1月1日", 2025, time.January, 1},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := ParseDate(tt.input, settings)
+			if err != nil {
+				t.Errorf("ParseDate() error = %v", err)
+				return
+			}
+			if result.Year() != tt.wantYear {
+				t.Errorf("Year = %v, want %v", result.Year(), tt.wantYear)
+			}
+			if result.Month() != tt.wantMonth {
+				t.Errorf("Month = %v, want %v", result.Month(), tt.wantMonth)
+			}
+			if result.Day() != tt.wantDay {
+				t.Errorf("Day = %v, want %v", result.Day(), tt.wantDay)
+			}
+		})
+	}
 }
 
 func TestJapanese_MixedWithEnglish(t *testing.T) {

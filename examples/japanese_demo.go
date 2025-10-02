@@ -135,18 +135,68 @@ func main() {
 	fmt.Println("Short form: 月曜   (getsuyo)")
 	fmt.Println("Both forms work the same way!")
 
+	// Japanese date formats
+	fmt.Println("\n--- Japanese Date Formats (YYYY年MM月DD日) ---")
+	dateFormats := []string{
+		"2024年12月31日",
+		"2025年1月1日",
+		"2024年10月15日",
+	}
+	for _, input := range dateFormats {
+		result, err := godateparser.ParseDate(input, settings)
+		if err != nil {
+			fmt.Printf("Error %s: %v\n", input, err)
+		} else {
+			fmt.Printf("Success %-20s -> %s\n", input, result.Format("2006-01-02"))
+		}
+	}
+
+	// Relative patterns with numbers
+	fmt.Println("\n--- Relative Patterns (N日前, N週後) ---")
+	relativePatterns := []string{
+		"3日前",   // 3 days ago
+		"2週後",   // in 2 weeks
+		"1ヶ月前", // 1 month ago
+	}
+	for _, input := range relativePatterns {
+		result, err := godateparser.ParseDate(input, settings)
+		if err != nil {
+			fmt.Printf("Error %s: %v\n", input, err)
+		} else {
+			fmt.Printf("Success %-12s -> %s\n", input, result.Format("2006-01-02"))
+		}
+	}
+
+	// Next/Last patterns
+	fmt.Println("\n--- Next/Last Patterns (来週, 先月) ---")
+	nextLastPatterns := []string{
+		"来週", // next week
+		"先週", // last week
+		"来月", // next month
+		"先月", // last month
+	}
+	for _, input := range nextLastPatterns {
+		result, err := godateparser.ParseDate(input, settings)
+		if err != nil {
+			fmt.Printf("Error %s: %v\n", input, err)
+		} else {
+			fmt.Printf("Success %-8s -> %s\n", input, result.Format("2006-01-02"))
+		}
+	}
+
 	// Note about Japanese date formats
-	fmt.Println("\n--- Note ---")
-	fmt.Println("Japanese support is now available!")
-	fmt.Println("Current support includes:")
+	fmt.Println("\n--- Summary ---")
+	fmt.Println("Japanese support is now comprehensive!")
+	fmt.Println("Supported features:")
 	fmt.Println("  Success Weekdays: 月曜日-日曜日 (full), 月曜-日曜 (short)")
 	fmt.Println("  Success Simple relative: 昨日 (kinou), 今日 (kyou), 明日 (ashita)")
 	fmt.Println("  Success Months: 1月-12月 (ichigatsu-juunigatsu)")
+	fmt.Println("  Success Date format: 2024年12月31日 (YYYY年MM月DD日)")
+	fmt.Println("  Success Relative patterns: 3日前, 2週後, 1ヶ月前")
+	fmt.Println("  Success Next/last: 来週, 先週, 来月, 先月")
 	fmt.Println("  Success Time terms: 正午 (shougo), 真夜中 (mayonaka)")
-	fmt.Println("\nPatterns requiring custom parser (coming soon):")
-	fmt.Println("  Japanese date format: 2024年12月31日")
-	fmt.Println("  Relative patterns: 3日前 (3 days ago), 2週後 (in 2 weeks)")
-	fmt.Println("  Next/last: 来週 (next week), 先月 (last month)")
-	fmt.Println("  Modified weekdays: 来週月曜日 (next Monday)")
+	fmt.Println("\nAdvanced patterns (planned for future):")
+	fmt.Println("  Combined weekday modifiers: 来週月曜日 (next Monday)")
+	fmt.Println("  (requires advanced tokenization)")
 }
 

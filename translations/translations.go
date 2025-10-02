@@ -75,14 +75,14 @@ type LocalizedPattern struct {
 
 // Registry holds all registered language translations.
 type Registry struct {
-	languages map[string]*Language
+	languages  map[string]*Language
 	defaultVal string
 }
 
 // NewRegistry creates a new translation registry.
 func NewRegistry() *Registry {
 	r := &Registry{
-		languages: make(map[string]*Language),
+		languages:  make(map[string]*Language),
 		defaultVal: "en",
 	}
 

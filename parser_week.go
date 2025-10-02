@@ -97,7 +97,7 @@ var weekPatterns = []*weekPattern{
 	// ISO 8601 with weekday: "2024-W15-3" (Wednesday of week 15)
 	{
 		regex: regexp.MustCompile(`^(\d{4})-?W(\d{1,2})-?(\d)$`),
-		parser: func(ctx *parserContext, matches []string) (time.Time, error) {
+		parser: func(_ *parserContext, matches []string) (time.Time, error) {
 			year, _ := strconv.Atoi(matches[1])
 			week, _ := strconv.Atoi(matches[2])
 			weekday, _ := strconv.Atoi(matches[3])

@@ -637,34 +637,33 @@ func tryCJKWeekdayModifier(ctx *parserContext, input string, lang *translations.
 						daysFromMonday += 7
 					}
 					return startOfNextWeek.AddDate(0, 0, daysFromMonday), nil
-				}
-				// month
-				baseDate := ctx.settings.RelativeBase.AddDate(0, 1, 0)
-				return findWeekday(baseDate, wdMatch.weekday, true), nil
-				} else {
-					// Last week/month
-					if unit == "week" {
-						// Find Monday of this week
-						daysFromMonday := int(ctx.settings.RelativeBase.Weekday() - time.Monday)
-						if daysFromMonday < 0 {
-							daysFromMonday += 7
-						}
-						startOfThisWeek := ctx.settings.RelativeBase.AddDate(0, 0, -daysFromMonday)
+			}
+			// month
+			baseDate := ctx.settings.RelativeBase.AddDate(0, 1, 0)
+			return findWeekday(baseDate, wdMatch.weekday, true), nil
+		}
+		// Last week/month
+		if unit == "week" {
+			// Find Monday of this week
+			daysFromMonday := int(ctx.settings.RelativeBase.Weekday() - time.Monday)
+			if daysFromMonday < 0 {
+				daysFromMonday += 7
+			}
+			startOfThisWeek := ctx.settings.RelativeBase.AddDate(0, 0, -daysFromMonday)
 
-						// Go back 7 days to get Monday of last week
-						startOfLastWeek := startOfThisWeek.AddDate(0, 0, -7)
+			// Go back 7 days to get Monday of last week
+			startOfLastWeek := startOfThisWeek.AddDate(0, 0, -7)
 
-						// Now find the target weekday within last week
-						daysToTarget := int(wdMatch.weekday - time.Monday)
-						if daysToTarget < 0 {
-						daysToTarget += 7
-					}
-					return startOfLastWeek.AddDate(0, 0, daysToTarget), nil
-				}
-				// month
-				baseDate := ctx.settings.RelativeBase.AddDate(0, -1, 0)
-				return findWeekday(baseDate, wdMatch.weekday, false), nil
-				}
+			// Now find the target weekday within last week
+			daysToTarget := int(wdMatch.weekday - time.Monday)
+			if daysToTarget < 0 {
+				daysToTarget += 7
+			}
+			return startOfLastWeek.AddDate(0, 0, daysToTarget), nil
+		}
+		// month
+		baseDate := ctx.settings.RelativeBase.AddDate(0, -1, 0)
+		return findWeekday(baseDate, wdMatch.weekday, false), nil
 			}
 		}
 	}

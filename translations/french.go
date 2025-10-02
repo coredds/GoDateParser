@@ -11,14 +11,14 @@ func NewFrenchTranslation() *Language {
 		Name: "French",
 		Months: map[string]time.Month{
 			// Full names
-			"janvier":   time.January,
-			"février":   time.February, "fevrier": time.February,
-			"mars":      time.March,
-			"avril":     time.April,
-			"mai":       time.May,
-			"juin":      time.June,
-			"juillet":   time.July,
-			"août":      time.August, "aout": time.August,
+			"janvier": time.January,
+			"février": time.February, "fevrier": time.February,
+			"mars":    time.March,
+			"avril":   time.April,
+			"mai":     time.May,
+			"juin":    time.June,
+			"juillet": time.July,
+			"août":    time.August, "aout": time.August,
 			"septembre": time.September,
 			"octobre":   time.October,
 			"novembre":  time.November,
@@ -89,4 +89,3 @@ func NewFrenchTranslation() *Language {
 		},
 	}
 }
-

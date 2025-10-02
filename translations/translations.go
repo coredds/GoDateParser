@@ -76,14 +76,14 @@ type LocalizedPattern struct {
 // Registry holds all registered language translations.
 type Registry struct {
 	languages map[string]*Language
-	default_  string
+	defaultVal string
 }
 
 // NewRegistry creates a new translation registry.
 func NewRegistry() *Registry {
 	r := &Registry{
 		languages: make(map[string]*Language),
-		default_:  "en",
+		defaultVal: "en",
 	}
 
 	// Register English by default
@@ -102,7 +102,7 @@ func (r *Registry) Get(code string) *Language {
 	if lang, ok := r.languages[code]; ok {
 		return lang
 	}
-	return r.languages[r.default_]
+	return r.languages[r.defaultVal]
 }
 
 // GetMultiple retrieves multiple languages by codes.
@@ -114,7 +114,7 @@ func (r *Registry) GetMultiple(codes []string) []*Language {
 		}
 	}
 	if len(langs) == 0 {
-		langs = append(langs, r.languages[r.default_])
+		langs = append(langs, r.languages[r.defaultVal])
 	}
 	return langs
 }
@@ -168,7 +168,7 @@ func (r *Registry) DetectLanguage(input string) string {
 
 	// Return language with highest score
 	maxScore := 0
-	detectedLang := r.default_
+	detectedLang := r.defaultVal
 	for code, score := range scores {
 		if score > maxScore {
 			maxScore = score

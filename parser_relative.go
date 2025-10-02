@@ -91,7 +91,7 @@ var relativePatterns = []*relativePattern{
 	// "now"
 	{
 		regex: regexp.MustCompile(`(?i)^now$`),
-		parser: func(ctx *parserContext, matches []string) (time.Time, error) {
+		parser: func(_ *parserContext, _ []string) (time.Time, error) {
 			return time.Now(), nil
 		},
 	},
@@ -519,7 +519,7 @@ func normalizeTimeUnit(unit string, lang *translations.Language) string {
 		return unit
 	}
 
-	checkUnit := func(terms []string, normalized string) bool {
+	checkUnit := func(terms []string, _ string) bool {
 		for _, term := range terms {
 			if strings.ToLower(term) == unit {
 				return true
@@ -574,7 +574,7 @@ func tryCJKWeekdayModifier(ctx *parserContext, input string, lang *translations.
 
 	// The input format is: modifier + unit + weekday (all concatenated, no spaces)
 	// e.g., "来週月曜" = "来" (next) + "週" (week) + "月曜" (Monday)
-	
+
 	// Try to match: modifier + any_characters
 	prefix := strings.ToLower(modifierTerm)
 	if !strings.HasPrefix(input, prefix) {
@@ -590,7 +590,7 @@ func tryCJKWeekdayModifier(ctx *parserContext, input string, lang *translations.
 	// Now we need to find a time unit followed by a weekday
 	// Strategy: Try to match weekdays from longest to shortest
 	// This ensures "月曜" matches before "月" alone
-	
+
 	// Get all weekdays sorted by length (longest first)
 	type weekdayMatch struct {
 		name    string
@@ -600,7 +600,7 @@ func tryCJKWeekdayModifier(ctx *parserContext, input string, lang *translations.
 	for name, wd := range lang.Weekdays {
 		weekdays = append(weekdays, weekdayMatch{name: name, weekday: wd})
 	}
-	
+
 	// Sort by length descending
 	sort.Slice(weekdays, func(i, j int) bool {
 		return len(weekdays[i].name) > len(weekdays[j].name)
@@ -612,10 +612,10 @@ func tryCJKWeekdayModifier(ctx *parserContext, input string, lang *translations.
 			// Found a weekday at the end
 			// The middle part should be a time unit
 			unitPart := remainder[:len(remainder)-len(wdMatch.name)]
-			
+
 			// Verify this is a valid time unit
 			unit := normalizeTimeUnit(unitPart, lang)
-			
+
 			// For weekday modifiers, we only support week/month as the unit
 			if unit == "week" || unit == "month" {
 				// Calculate the target date
@@ -630,7 +630,7 @@ func tryCJKWeekdayModifier(ctx *parserContext, input string, lang *translations.
 							daysToMonday += 7
 						}
 						startOfNextWeek := ctx.settings.RelativeBase.AddDate(0, 0, daysToMonday)
-						
+
 						// Now find the target weekday within that week
 						daysFromMonday := int(wdMatch.weekday - time.Monday)
 						if daysFromMonday < 0 {
@@ -650,10 +650,10 @@ func tryCJKWeekdayModifier(ctx *parserContext, input string, lang *translations.
 							daysFromMonday += 7
 						}
 						startOfThisWeek := ctx.settings.RelativeBase.AddDate(0, 0, -daysFromMonday)
-						
+
 						// Go back 7 days to get Monday of last week
 						startOfLastWeek := startOfThisWeek.AddDate(0, 0, -7)
-						
+
 						// Now find the target weekday within last week
 						daysToTarget := int(wdMatch.weekday - time.Monday)
 						if daysToTarget < 0 {

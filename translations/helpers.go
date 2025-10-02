@@ -103,7 +103,7 @@ func NormalizeTimeUnit(input string, languages []*Language) string {
 			continue
 		}
 
-		checkUnit := func(terms []string, normalized string) bool {
+		checkUnit := func(terms []string, _ string) bool {
 			for _, term := range terms {
 				if strings.ToLower(term) == input {
 					return true

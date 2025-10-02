@@ -212,8 +212,8 @@ func TestChinese_RelativeNextLast(t *testing.T) {
 	}{
 		{"下周", "下周", 2024, time.June, 22},
 		{"上周", "上周", 2024, time.June, 8},
-		{"下月", "下月", 2024, time.July, 15},  // Using 下月 instead of 下个月
-		{"上月", "上月", 2024, time.May, 15},   // Using 上月 instead of 上个月
+		{"下月", "下月", 2024, time.July, 15}, // Using 下月 instead of 下个月
+		{"上月", "上月", 2024, time.May, 15},  // Using 上月 instead of 上个月
 	}
 
 	for _, tt := range tests {
@@ -249,12 +249,12 @@ func TestChinese_WeekdaysWithModifiers(t *testing.T) {
 		wantWeekday time.Weekday
 		wantDay     int
 	}{
-		{"下周一", "下周一", time.Monday, 17},    // Next week Monday (using 周) - June 17-23
-		{"上周一", "上周一", time.Monday, 3},     // Last week Monday (using 周) - June 3-9
+		{"下周一", "下周一", time.Monday, 17},   // Next week Monday (using 周) - June 17-23
+		{"上周一", "上周一", time.Monday, 3},    // Last week Monday (using 周) - June 3-9
 		{"下周五", "下周五", time.Friday, 21},   // Next week Friday
 		{"上周五", "上周五", time.Friday, 7},    // Last week Friday
 		{"下星期一", "下星期一", time.Monday, 17}, // Next week Monday (using 星期)
-		{"上星期五", "上星期五", time.Friday, 7}, // Last week Friday (using 星期)
+		{"上星期五", "上星期五", time.Friday, 7},  // Last week Friday (using 星期)
 	}
 
 	for _, tt := range tests {

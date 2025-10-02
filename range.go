@@ -27,7 +27,7 @@ var rangePatterns = []*rangePattern{
 	// "from X to Y" pattern
 	{
 		regex: regexp.MustCompile(`(?i)^from\s+(.+)\s+to\s+(.+)$`),
-		parser: func(ctx *parserContext, matches []string) (*DateRange, error) {
+		parser: func(ctx *parserContext, _ []string) (*DateRange, error) {
 			// Use smart splitting to handle multi-word dates
 			startStr, endStr, err := splitRangeOnKeyword(ctx.input, "from", "to", ctx.settings)
 			if err != nil {
@@ -63,7 +63,7 @@ var rangePatterns = []*rangePattern{
 	// "between X and Y" pattern
 	{
 		regex: regexp.MustCompile(`(?i)^between\s+(.+)\s+and\s+(.+)$`),
-		parser: func(ctx *parserContext, matches []string) (*DateRange, error) {
+		parser: func(ctx *parserContext, _ []string) (*DateRange, error) {
 			// Use smart splitting to handle multi-word dates
 			startStr, endStr, err := splitRangeOnKeyword(ctx.input, "between", "and", ctx.settings)
 			if err != nil {

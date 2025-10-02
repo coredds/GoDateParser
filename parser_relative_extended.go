@@ -187,7 +187,7 @@ var quarterPatterns = []*relativePattern{
 	// "Q1 2024", "Q4 2025"
 	{
 		regex: regexp.MustCompile(`(?i)^Q([1-4])\s+(\d{4})$`),
-		parser: func(ctx *parserContext, matches []string) (time.Time, error) {
+		parser: func(_ *parserContext, matches []string) (time.Time, error) {
 			quarter, _ := strconv.Atoi(matches[1])
 			year, _ := strconv.Atoi(matches[2])
 			return getQuarterStart(year, quarter), nil
@@ -484,7 +484,7 @@ func tryParseThisNextLast(ctx *parserContext, input string, lang *translations.L
 			"años":    "year",
 			"semana":  "week",
 			"semanas": "week",
-			"semaine": "week", // French
+			"semaine": "week",  // French
 			"mois":    "month", // French
 		}
 		for periodEs, periodEn := range periods {

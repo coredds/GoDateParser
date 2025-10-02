@@ -20,7 +20,7 @@ var weekPatterns = []*weekPattern{
 	// ISO 8601 week format: "2024-W15", "2024W15"
 	{
 		regex: regexp.MustCompile(`^(\d{4})-?W(\d{1,2})$`),
-		parser: func(ctx *parserContext, matches []string) (time.Time, error) {
+		parser: func(_ *parserContext, matches []string) (time.Time, error) {
 			year, _ := strconv.Atoi(matches[1])
 			week, _ := strconv.Atoi(matches[2])
 
@@ -39,7 +39,7 @@ var weekPatterns = []*weekPattern{
 	// Week with year: "Week 15 2024", "Week 42 2023"
 	{
 		regex: regexp.MustCompile(`(?i)^week\s+(\d{1,2})\s+(\d{4})$`),
-		parser: func(ctx *parserContext, matches []string) (time.Time, error) {
+		parser: func(_ *parserContext, matches []string) (time.Time, error) {
 			week, _ := strconv.Atoi(matches[1])
 			year, _ := strconv.Atoi(matches[2])
 
@@ -58,7 +58,7 @@ var weekPatterns = []*weekPattern{
 	// Week with year (alternate): "2024 Week 15"
 	{
 		regex: regexp.MustCompile(`(?i)^(\d{4})\s+week\s+(\d{1,2})$`),
-		parser: func(ctx *parserContext, matches []string) (time.Time, error) {
+		parser: func(_ *parserContext, matches []string) (time.Time, error) {
 			year, _ := strconv.Atoi(matches[1])
 			week, _ := strconv.Atoi(matches[2])
 

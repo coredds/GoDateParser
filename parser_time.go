@@ -474,8 +474,9 @@ func tryParseMenosCuarto(ctx *parserContext, input string, lang *translations.La
 
 	return time.Time{}, fmt.Errorf("no match")
 }
+
 // tryParseFrenchHFormat parses French "15h30" or "15h" format
-func tryParseFrenchHFormat(ctx *parserContext, input string, lang *translations.Language) (time.Time, error) {
+func tryParseFrenchHFormat(ctx *parserContext, input string, _ *translations.Language) (time.Time, error) {
 	// Pattern: "15h30" or "15h" (h is the separator)
 	pattern := `^(\d{1,2})h(\d{2})?$`
 	re := regexp.MustCompile(pattern)

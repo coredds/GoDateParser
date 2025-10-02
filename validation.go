@@ -101,7 +101,7 @@ func validateDateTime(year, month, day, hour, minute, second int) error {
 
 // isAmbiguousDate checks if a numeric date is ambiguous (e.g., 01/02/2024).
 // Returns true if the date could be interpreted as both MDY and DMY.
-func isAmbiguousDate(num1, num2, year int) bool {
+func isAmbiguousDate(num1, num2, _ int) bool {
 	// Check if num1 could be month and num2 could be day (MDY)
 	mdyPossible := num1 >= 1 && num1 <= 12 && num2 >= 1 && num2 <= 31
 

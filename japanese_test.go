@@ -252,12 +252,12 @@ func TestJapanese_WeekdaysWithModifiers(t *testing.T) {
 		wantWeekday time.Weekday
 		wantDay     int
 	}{
-		{"来週月曜", "来週月曜", time.Monday, 17},    // Next week Monday (June 17-23)
-		{"先週月曜", "先週月曜", time.Monday, 3},     // Last week Monday (June 3-9)
+		{"来週月曜", "来週月曜", time.Monday, 17},   // Next week Monday (June 17-23)
+		{"先週月曜", "先週月曜", time.Monday, 3},    // Last week Monday (June 3-9)
 		{"来週金曜", "来週金曜", time.Friday, 21},   // Next week Friday
 		{"先週金曜", "先週金曜", time.Friday, 7},    // Last week Friday
 		{"来週月曜日", "来週月曜日", time.Monday, 17}, // With 日 suffix
-		{"先週金曜日", "先週金曜日", time.Friday, 7}, // With 日 suffix
+		{"先週金曜日", "先週金曜日", time.Friday, 7},  // With 日 suffix
 	}
 
 	for _, tt := range tests {

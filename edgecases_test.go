@@ -398,7 +398,7 @@ func TestEdgeCase_UnicodeWhitespace(t *testing.T) {
 
 	validCount := 0
 	for _, input := range tests {
-		t.Run(input, func(t *testing.T) {
+		t.Run(input, func(_ *testing.T) {
 			_, err := ParseDate(input, nil)
 			if err == nil {
 				validCount++

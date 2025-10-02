@@ -161,14 +161,33 @@ func main() {
 		}
 	}
 
-	// Auto-detection
-	settingsMulti := &godateparser.Settings{Languages: []string{"pt", "es", "en"}}
-	examplesMulti := []string{
-		"amanhã",   // Portuguese
-		"mañana",   // Spanish
-		"tomorrow", // English
+	// French
+	settingsFR := &godateparser.Settings{Languages: []string{"fr"}}
+	examplesFR := []string{
+		"15 juin 2024",
+		"hier",
+		"prochain lundi",
+		"il y a 2 jours",
 	}
-	fmt.Println("  Auto-detection (pt, es, en):")
+	fmt.Println("  French:")
+	for _, input := range examplesFR {
+		date, err := godateparser.ParseDate(input, settingsFR)
+		if err != nil {
+			fmt.Printf("    ❌ '%s' -> Error: %v\n", input, err)
+		} else {
+			fmt.Printf("    ✓ '%s' -> %s\n", input, date.Format("2006-01-02"))
+		}
+	}
+
+	// Auto-detection
+	settingsMulti := &godateparser.Settings{Languages: []string{"pt", "es", "fr", "en"}}
+	examplesMulti := []string{
+		"amanhã",     // Portuguese
+		"mañana",     // Spanish
+		"demain",     // French
+		"tomorrow",   // English
+	}
+	fmt.Println("  Auto-detection (pt, es, fr, en):")
 	for _, input := range examplesMulti {
 		date, err := godateparser.ParseDate(input, settingsMulti)
 		if err != nil {

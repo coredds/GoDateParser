@@ -12,7 +12,7 @@ A powerful Go library for parsing human-readable date strings in multiple format
 
 ## Features
 
-GoDateParser v1.3.1 supports **English**, **Spanish**, and **Portuguese (Brazil)** with comprehensive date parsing capabilities.
+GoDateParser v1.3.1 supports **English**, **Spanish**, **Portuguese (Brazil)**, and **French (France)** with comprehensive date parsing capabilities.
 
 ### Core Parsing
 - **Absolute Dates**: ISO 8601, numeric formats (MDY/DMY/YMD), month names, two-digit years
@@ -23,7 +23,7 @@ GoDateParser v1.3.1 supports **English**, **Spanish**, and **Portuguese (Brazil)
 - **Date Ranges**: From/to patterns, duration ranges (next 7 days, last 2 weeks)
 
 ### Advanced Features
-- **Multi-Language Support**: English (en), Spanish (es), and Portuguese (pt) with automatic detection
+- **Multi-Language Support**: English (en), Spanish (es), Portuguese (pt), and French (fr) with automatic detection
 - **Timezone Support**: 30+ abbreviations, offsets, DST-aware via IANA database
 - **Incomplete Dates**: Year-only, month-only, month+day without year
 - **Ordinal Dates**: 1st, 2nd, 3rd, 21st with full/abbreviated month names
@@ -32,7 +32,7 @@ GoDateParser v1.3.1 supports **English**, **Spanish**, and **Portuguese (Brazil)
 - **PREFER_DATES_FROM**: Future/past disambiguation for ambiguous dates
 
 ### Quality & Performance
-- **Comprehensive**: 600+ test cases covering all scenarios (English + Spanish + Portuguese)
+- **Comprehensive**: 700+ test cases covering all scenarios (English + Spanish + Portuguese + French)
 - **Fast**: Sub-50μs parsing for most operations
 - **Robust**: Custom error types with helpful suggestions
 - **Flexible**: Extensive customization options

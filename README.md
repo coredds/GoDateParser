@@ -171,69 +171,6 @@ godateparser.ParseDate("next quarter", nil) // First day of next quarter
 godateparser.ParseDate("last quarter", nil) // First day of last quarter
 ```
 
-### v1.1.0: Python dateparser Feature Parity
-
-GoDateParser now includes key features from Python's dateparser library:
-
-```go
-// PREFER_DATES_FROM: Control temporal disambiguation
-settings := &godateparser.Settings{
-    PreferDatesFrom: "future",  // or "past"
-}
-
-// Standalone weekdays
-godateparser.ParseDate("Monday", settings)     // Next Monday (with "future")
-godateparser.ParseDate("Friday", settings)     // Next Friday
-
-settings.PreferDatesFrom = "past"
-godateparser.ParseDate("Monday", settings)     // Last Monday (with "past")
-
-// Incomplete dates (year, month, or month+day without year)
-godateparser.ParseDate("2024", nil)            // January 1, 2024
-godateparser.ParseDate("May", nil)             // May 1 of current/next year
-godateparser.ParseDate("June 15", nil)         // June 15 of current/next year
-godateparser.ParseDate("15 June", nil)         // June 15 of current/next year
-
-// Ordinal dates
-godateparser.ParseDate("1st", nil)             // 1st of current/next month
-godateparser.ParseDate("June 3rd", nil)        // June 3
-godateparser.ParseDate("3rd June", nil)        // June 3
-godateparser.ParseDate("3rd of June", nil)     // June 3
-godateparser.ParseDate("June 3rd 2024", nil)   // June 3, 2024
-godateparser.ParseDate("3rd of June 2024", nil) // June 3, 2024
-godateparser.ParseDate("21st March", nil)      // March 21
-
-// Additional relative terms
-godateparser.ParseDate("a fortnight ago", nil)  // 14 days ago
-godateparser.ParseDate("in a fortnight", nil)   // 14 days from now
-godateparser.ParseDate("next fortnight", nil)   // 14 days from now
-godateparser.ParseDate("a decade ago", nil)     // 10 years ago
-godateparser.ParseDate("in a decade", nil)      // 10 years from now
-godateparser.ParseDate("a quarter ago", nil)    // 3 months ago
-```
-
-### v1.2.0: 100% Python dateparser Feature Parity
-
-GoDateParser now achieves **complete feature parity** with Python's dateparser for English:
-
-```go
-// Week number parsing (ISO 8601)
-godateparser.ParseDate("2024-W15", nil)         // Week 15 of 2024 (Monday April 8)
-godateparser.ParseDate("2024W15", nil)          // Without dash
-godateparser.ParseDate("Week 15 2024", nil)     // Natural language
-godateparser.ParseDate("2024 Week 15", nil)     // Alternate format
-godateparser.ParseDate("W42", nil)              // Week 42 of current year
-godateparser.ParseDate("2024-W15-3", nil)       // Wednesday of week 15
-
-// Natural time expressions
-godateparser.ParseDate("quarter past 3", nil)   // 3:15
-godateparser.ParseDate("half past 9", nil)      // 9:30
-godateparser.ParseDate("quarter to 5", nil)     // 4:45
-godateparser.ParseDate("quarter past noon", nil)     // 12:15
-godateparser.ParseDate("half past midnight", nil)    // 0:30
-godateparser.ParseDate("quarter to midnight", nil)   // 23:45
-```
-
 ### Custom Settings
 
 ```go

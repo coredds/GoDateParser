@@ -320,20 +320,20 @@ func TestParseRelative_ZeroQuantity(t *testing.T) {
 func BenchmarkParseRelative_Simple(b *testing.B) {
 	settings := DefaultSettings()
 	for i := 0; i < b.N; i++ {
-		ParseDate("yesterday", settings)
+		_, _ = ParseDate("yesterday", settings)
 	}
 }
 
 func BenchmarkParseRelative_Ago(b *testing.B) {
 	settings := DefaultSettings()
 	for i := 0; i < b.N; i++ {
-		ParseDate("2 days ago", settings)
+		_, _ = ParseDate("2 days ago", settings)
 	}
 }
 
 func BenchmarkParseRelative_Complex(b *testing.B) {
 	settings := DefaultSettings()
 	for i := 0; i < b.N; i++ {
-		ParseDate("a week from Tuesday", settings)
+		_, _ = ParseDate("a week from Tuesday", settings)
 	}
 }

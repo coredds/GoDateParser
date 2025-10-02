@@ -16,6 +16,7 @@ func init() {
 		// Register all supported languages
 		GlobalRegistry.Register(NewEnglishTranslation())
 		GlobalRegistry.Register(NewSpanishTranslation())
+		GlobalRegistry.Register(NewPortugueseTranslation())
 	})
 }
 

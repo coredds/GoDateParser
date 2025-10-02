@@ -379,26 +379,26 @@ func TestNaturalTime_QuarterTo(t *testing.T) {
 func BenchmarkFeatures_IncompleteDate(b *testing.B) {
 	settings := DefaultSettings()
 	for i := 0; i < b.N; i++ {
-		ParseDate("June 15", settings)
+		_, _ = ParseDate("June 15", settings)
 	}
 }
 
 func BenchmarkFeatures_OrdinalDate(b *testing.B) {
 	settings := DefaultSettings()
 	for i := 0; i < b.N; i++ {
-		ParseDate("3rd June", settings)
+		_, _ = ParseDate("3rd June", settings)
 	}
 }
 
 func BenchmarkFeatures_WeekNumber(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		ParseDate("2024-W15", nil)
+		_, _ = ParseDate("2024-W15", nil)
 	}
 }
 
 func BenchmarkFeatures_NaturalTime(b *testing.B) {
 	settings := DefaultSettings()
 	for i := 0; i < b.N; i++ {
-		ParseDate("quarter past 3", settings)
+		_, _ = ParseDate("quarter past 3", settings)
 	}
 }

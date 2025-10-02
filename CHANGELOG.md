@@ -5,6 +5,43 @@ All notable changes to GoDateParser will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2025-10-02
+
+### Added
+- **Portuguese Language Support (pt)**: Brazilian Portuguese with comprehensive date parsing
+  - Months: `janeiro`, `fevereiro`, ..., `dezembro` (full and abbreviated)
+  - Weekdays: `segunda-feira`, `terça-feira`, ..., `domingo` (full and abbreviated forms)
+  - Simple relative: `ontem` (yesterday), `hoje` (today), `amanhã` (tomorrow)
+  - Ago patterns: `há 2 dias` (2 days ago), `há 1 semana` (1 week ago)
+  - Future patterns: `em 3 dias` (in 3 days), `daqui a 2 semanas` (in 2 weeks)
+  - Next/last: `próxima segunda` (next Monday), `última sexta` (last Friday)
+  - Period boundaries: `início de ano`, `fim de ano`, `início de semana`
+  - This/next/last: `esta segunda`, `próxima semana`, `último mês`
+  - Time expressions: `meio-dia`, `meia-noite`, `3 e meia`
+  - Incomplete dates: `maio`, `junho 15`, `3 de junho`
+  - All date formats: `31 dezembro 2024`, `15 de junho de 2024`, `3 de junho de 2024`
+  - Works with and without accents: `proximo mes`, `ultimo ano`, `ha 2 dias`
+
+- **New Files**:
+  - `translations/portuguese.go` - Portuguese language implementation
+  - `portuguese_test.go` - 100+ comprehensive Portuguese test cases
+
+### Changed
+- **Test Suite**:
+  - 115+ test functions (up from 103)
+  - 600+ test cases including Portuguese tests
+  - `translations/registry.go` - Added Portuguese to global registry
+
+### Fixed
+- **Code Quality**: Fixed all linting issues across the project
+  - Fixed 24 unchecked error returns in benchmark functions
+  - Removed 3 unused functions (`monthNameToNumber`, `weekdayNameToWeekday`, `getISOWeek`)
+  - Removed unused imports and helper functions
+  - Project now passes `golangci-lint` with zero issues
+
+### Summary
+- Comprehensive support for **English**, **Spanish**, and **Portuguese (Brazil)** languages
+
 ## [1.3.0] - 2025-10-02
 
 ### Added
@@ -15,7 +52,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Support for multiple languages with priority ordering
   - Localized patterns for months, weekdays, relative terms, time expressions
 
-- **Spanish Language Support (es)**: Complete feature parity with English
+- **Spanish Language Support (es)**: Comprehensive Spanish language support
   - Months: `enero`, `febrero`, ..., `diciembre` (full and abbreviated)
   - Weekdays: `lunes`, `martes`, ..., `domingo` (with and without accents)
   - Simple relative: `ayer` (yesterday), `hoy` (today), `mañana` (tomorrow)
@@ -60,8 +97,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dynamic pattern building cached per language
 - Overall parsing remains under 50μs for most operations
 
-### Milestone
-- **100% feature parity** achieved with Python dateparser for **English** and **Spanish**
+### Summary
+- Comprehensive multi-language support for **English** and **Spanish**
 
 ## [1.2.0] - 2025-10-02
 
@@ -97,8 +134,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Natural time parsing: ~6.3μs/op
 - All operations remain under 7μs
 
-### Milestone
-- **100% feature parity achieved** with Python dateparser for English language support
+### Summary
+- Comprehensive date parsing features including week numbers and natural time expressions
 
 ## [1.1.0] - 2025-10-02
 
@@ -307,7 +344,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **v0.2.0**: Production hardening with validation and error handling (192 tests)
 - **v0.3.0**: Timezone support (244 tests)
 - **v1.0.0**: Extended relative expressions, time parsing, date ranges (371 tests)
-- **v1.1.0**: Python dateparser feature parity - incomplete dates, ordinals, PREFER_DATES_FROM (455 tests)
-- **v1.2.0**: Complete feature parity - week numbers, natural time expressions (552 tests)
+- **v1.1.0**: Incomplete dates, ordinals, PREFER_DATES_FROM (455 tests)
+- **v1.2.0**: Week numbers, natural time expressions (552 tests)
 
 **Total growth: 431% increase in test coverage from v0.1.0 to v1.2.0**

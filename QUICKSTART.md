@@ -251,7 +251,7 @@ godateparser.ParseDate("3 y cuarto", settings)          // 3:15
 
 - Read the full [README.md](README.md) for complete documentation and Spanish examples
 - Check the `translations/` package to see how language support is implemented
-- Review [CHANGELOG.md](CHANGELOG.md) for v1.3.0 multi-language features
+- Review [CHANGELOG.md](CHANGELOG.md) for v1.3.1 Portuguese language support and improvements
 
 ## Getting Help
 

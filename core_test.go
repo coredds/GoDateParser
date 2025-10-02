@@ -349,26 +349,26 @@ func TestParseDate_ExtraWhitespace(t *testing.T) {
 
 func BenchmarkParseDate_ISO8601(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		ParseDate("2024-12-31", nil)
+		_, _ = ParseDate("2024-12-31", nil)
 	}
 }
 
 func BenchmarkParseDate_Relative(b *testing.B) {
 	settings := DefaultSettings()
 	for i := 0; i < b.N; i++ {
-		ParseDate("yesterday", settings)
+		_, _ = ParseDate("yesterday", settings)
 	}
 }
 
 func BenchmarkParseDate_Timestamp(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		ParseDate("1609459200", nil)
+		_, _ = ParseDate("1609459200", nil)
 	}
 }
 
 func BenchmarkExtractDates(b *testing.B) {
 	text := "Meeting on 2024-12-31 and follow-up on 2025-01-15."
 	for i := 0; i < b.N; i++ {
-		ExtractDates(text, nil)
+		_, _ = ExtractDates(text, nil)
 	}
 }

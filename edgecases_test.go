@@ -418,7 +418,7 @@ func BenchmarkEdgeCase_MonthBoundary(b *testing.B) {
 	base := time.Date(2024, 1, 31, 12, 0, 0, 0, time.UTC)
 	settings := &Settings{RelativeBase: base}
 	for i := 0; i < b.N; i++ {
-		ParseDate("next month", settings)
+		_, _ = ParseDate("next month", settings)
 	}
 }
 
@@ -426,6 +426,6 @@ func BenchmarkEdgeCase_YearBoundary(b *testing.B) {
 	base := time.Date(2024, 12, 31, 12, 0, 0, 0, time.UTC)
 	settings := &Settings{RelativeBase: base}
 	for i := 0; i < b.N; i++ {
-		ParseDate("tomorrow", settings)
+		_, _ = ParseDate("tomorrow", settings)
 	}
 }

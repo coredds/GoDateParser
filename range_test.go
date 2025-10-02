@@ -448,7 +448,7 @@ func BenchmarkParseRange_FromTo(b *testing.B) {
 	base := time.Date(2024, 10, 15, 12, 0, 0, 0, time.UTC)
 	settings := &Settings{RelativeBase: base}
 	for i := 0; i < b.N; i++ {
-		ParseDateRange("from yesterday to tomorrow", settings)
+		_, _ = ParseDateRange("from yesterday to tomorrow", settings)
 	}
 }
 
@@ -456,7 +456,7 @@ func BenchmarkParseRange_BetweenAnd(b *testing.B) {
 	base := time.Date(2024, 10, 15, 12, 0, 0, 0, time.UTC)
 	settings := &Settings{RelativeBase: base}
 	for i := 0; i < b.N; i++ {
-		ParseDateRange("between 2024-01-01 and 2024-12-31", settings)
+		_, _ = ParseDateRange("between 2024-01-01 and 2024-12-31", settings)
 	}
 }
 
@@ -464,7 +464,7 @@ func BenchmarkParseRange_Next7Days(b *testing.B) {
 	base := time.Date(2024, 10, 15, 12, 0, 0, 0, time.UTC)
 	settings := &Settings{RelativeBase: base}
 	for i := 0; i < b.N; i++ {
-		ParseDateRange("next 7 days", settings)
+		_, _ = ParseDateRange("next 7 days", settings)
 	}
 }
 

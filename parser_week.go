@@ -145,13 +145,6 @@ func getDateFromISOWeek(year, week, weekday int) time.Time {
 	return mondayWeek1.AddDate(0, 0, daysToAdd)
 }
 
-// getISOWeek returns the ISO week number and year for a given date.
-// This is the inverse of getDateFromISOWeek.
-func getISOWeek(t time.Time) (year, week int) {
-	year, week = t.ISOWeek()
-	return
-}
-
 // tryParseWeekNumber attempts to parse ISO week number patterns
 func tryParseWeekNumber(ctx *parserContext) (time.Time, error) {
 	input := strings.TrimSpace(ctx.input)

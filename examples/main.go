@@ -122,5 +122,62 @@ func main() {
 	}
 	fmt.Println()
 
+	// Example 7: Multi-language support
+	fmt.Println("7. Multi-Language Support:")
+
+	// Portuguese
+	settingsPT := &godateparser.Settings{Languages: []string{"pt"}}
+	examplesPT := []string{
+		"15 de junho de 2024",
+		"ontem",
+		"próxima segunda",
+		"há 2 dias",
+	}
+	fmt.Println("  Portuguese:")
+	for _, input := range examplesPT {
+		date, err := godateparser.ParseDate(input, settingsPT)
+		if err != nil {
+			fmt.Printf("    ❌ '%s' -> Error: %v\n", input, err)
+		} else {
+			fmt.Printf("    ✓ '%s' -> %s\n", input, date.Format("2006-01-02"))
+		}
+	}
+
+	// Spanish
+	settingsES := &godateparser.Settings{Languages: []string{"es"}}
+	examplesES := []string{
+		"15 de junio de 2024",
+		"ayer",
+		"próximo lunes",
+		"hace 2 días",
+	}
+	fmt.Println("  Spanish:")
+	for _, input := range examplesES {
+		date, err := godateparser.ParseDate(input, settingsES)
+		if err != nil {
+			fmt.Printf("    ❌ '%s' -> Error: %v\n", input, err)
+		} else {
+			fmt.Printf("    ✓ '%s' -> %s\n", input, date.Format("2006-01-02"))
+		}
+	}
+
+	// Auto-detection
+	settingsMulti := &godateparser.Settings{Languages: []string{"pt", "es", "en"}}
+	examplesMulti := []string{
+		"amanhã",   // Portuguese
+		"mañana",   // Spanish
+		"tomorrow", // English
+	}
+	fmt.Println("  Auto-detection (pt, es, en):")
+	for _, input := range examplesMulti {
+		date, err := godateparser.ParseDate(input, settingsMulti)
+		if err != nil {
+			fmt.Printf("    ❌ '%s' -> Error: %v\n", input, err)
+		} else {
+			fmt.Printf("    ✓ '%s' -> %s\n", input, date.Format("2006-01-02"))
+		}
+	}
+	fmt.Println()
+
 	fmt.Println("=== Examples Complete ===")
 }

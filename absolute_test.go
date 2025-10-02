@@ -231,19 +231,19 @@ func TestParseAbsolute_LeapYear(t *testing.T) {
 
 func BenchmarkParseAbsolute_ISO8601(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		ParseDate("2024-12-31", nil)
+		_, _ = ParseDate("2024-12-31", nil)
 	}
 }
 
 func BenchmarkParseAbsolute_Numeric(b *testing.B) {
 	settings := &Settings{DateOrder: "MDY"}
 	for i := 0; i < b.N; i++ {
-		ParseDate("12/31/2024", settings)
+		_, _ = ParseDate("12/31/2024", settings)
 	}
 }
 
 func BenchmarkParseAbsolute_MonthName(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		ParseDate("December 31, 2024", nil)
+		_, _ = ParseDate("December 31, 2024", nil)
 	}
 }

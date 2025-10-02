@@ -187,21 +187,3 @@ func (r *Registry) SupportedLanguages() []string {
 	}
 	return codes
 }
-
-// Helper function to create case-insensitive map
-func createMonthMap(months map[string]time.Month) map[string]time.Month {
-	result := make(map[string]time.Month)
-	for name, month := range months {
-		result[strings.ToLower(name)] = month
-	}
-	return result
-}
-
-// Helper function to create case-insensitive weekday map
-func createWeekdayMap(weekdays map[string]time.Weekday) map[string]time.Weekday {
-	result := make(map[string]time.Weekday)
-	for name, weekday := range weekdays {
-		result[strings.ToLower(name)] = weekday
-	}
-	return result
-}

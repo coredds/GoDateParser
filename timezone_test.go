@@ -350,25 +350,25 @@ func TestApplyTimezone(t *testing.T) {
 
 func BenchmarkParseTimezone_Abbreviation(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		ParseTimezone("EST")
+		_, _ = ParseTimezone("EST")
 	}
 }
 
 func BenchmarkParseTimezone_Offset(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		ParseTimezone("+05:00")
+		_, _ = ParseTimezone("+05:00")
 	}
 }
 
 func BenchmarkParseDate_WithTimezone(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		ParseDate("2024-12-31T10:30:00Z", nil)
+		_, _ = ParseDate("2024-12-31T10:30:00Z", nil)
 	}
 }
 
 func BenchmarkExtractTimezone(b *testing.B) {
 	input := "2024-12-31T10:30:00+05:00"
 	for i := 0; i < b.N; i++ {
-		ExtractTimezone(input)
+		_, _, _ = ExtractTimezone(input)
 	}
 }

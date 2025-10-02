@@ -1,10 +1,10 @@
 # GoDateParser
 
-A powerful Go library for parsing human-readable date strings in multiple formats and languages. GoDateParser implements core functionality inspired by the popular Python [dateparser](https://github.com/scrapinghub/dateparser) library, optimized for Go's ecosystem and performance.
+A powerful Go library for parsing human-readable date strings in multiple formats and languages.
 
 ## Features
 
-GoDateParser v1.3.0 achieves 100% feature parity with Python's dateparser library for **English** and **Spanish** language support.
+GoDateParser v1.3.1 supports **English**, **Spanish**, and **Portuguese (Brazil)** with comprehensive date parsing capabilities.
 
 ### Core Parsing
 - **Absolute Dates**: ISO 8601, numeric formats (MDY/DMY/YMD), month names, two-digit years
@@ -15,7 +15,7 @@ GoDateParser v1.3.0 achieves 100% feature parity with Python's dateparser librar
 - **Date Ranges**: From/to patterns, duration ranges (next 7 days, last 2 weeks)
 
 ### Advanced Features
-- **Multi-Language Support**: English (en) and Spanish (es) with automatic detection
+- **Multi-Language Support**: English (en), Spanish (es), and Portuguese (pt) with automatic detection
 - **Timezone Support**: 30+ abbreviations, offsets, DST-aware via IANA database
 - **Incomplete Dates**: Year-only, month-only, month+day without year
 - **Ordinal Dates**: 1st, 2nd, 3rd, 21st with full/abbreviated month names
@@ -24,7 +24,7 @@ GoDateParser v1.3.0 achieves 100% feature parity with Python's dateparser librar
 - **PREFER_DATES_FROM**: Future/past disambiguation for ambiguous dates
 
 ### Quality & Performance
-- **Comprehensive**: 500+ test cases covering all scenarios (English + Spanish)
+- **Comprehensive**: 600+ test cases covering all scenarios (English + Spanish + Portuguese)
 - **Fast**: Sub-50μs parsing for most operations
 - **Robust**: Custom error types with helpful suggestions
 - **Flexible**: Extensive customization options
@@ -171,9 +171,7 @@ godateparser.ParseDate("next quarter", nil) // First day of next quarter
 godateparser.ParseDate("last quarter", nil) // First day of last quarter
 ```
 
-### v1.1.0: Python dateparser Feature Parity
-
-GoDateParser now includes key features from Python's dateparser library:
+### Advanced Date Parsing Features
 
 ```go
 // PREFER_DATES_FROM: Control temporal disambiguation
@@ -212,9 +210,7 @@ godateparser.ParseDate("in a decade", nil)      // 10 years from now
 godateparser.ParseDate("a quarter ago", nil)    // 3 months ago
 ```
 
-### v1.2.0: 100% Python dateparser Feature Parity
-
-GoDateParser now achieves **complete feature parity** with Python's dateparser for English:
+### Week Numbers and Natural Time Expressions
 
 ```go
 // Week number parsing (ISO 8601)
@@ -385,6 +381,7 @@ GoDateParser supports multiple languages with automatic detection or explicit se
 
 - **English (en)**: Full support for all features
 - **Spanish (es)**: Full support for all features
+- **Portuguese (pt)**: Full support for all features (Brazilian Portuguese)
 
 ### Language Selection
 
@@ -394,6 +391,7 @@ GoDateParser supports multiple languages with automatic detection or explicit se
 // Automatically detects language from input
 godateparser.ParseDate("December 31, 2024", nil)  // English
 godateparser.ParseDate("31 diciembre 2024", nil)  // Spanish
+godateparser.ParseDate("31 dezembro 2024", nil)   // Portuguese
 ```
 
 #### Explicit Language Selection
@@ -412,6 +410,13 @@ settings = &godateparser.Settings{
 godateparser.ParseDate("December 31, 2024", settings)
 
 // Enable multiple languages with priority
+settings = &godateparser.Settings{
+    Languages: []string{"pt", "en"},  // Try Portuguese first, then English
+}
+godateparser.ParseDate("15 junho 2024", settings)   // Portuguese
+godateparser.ParseDate("June 15, 2024", settings)    // English
+
+// Mix all three languages
 settings = &godateparser.Settings{
     Languages: []string{"es", "en"}, // Try Spanish first, then English
 }
@@ -528,6 +533,47 @@ godateparser.ParseDate("9 y media", settings)      // 9:30
 godateparser.ParseDate("menos cuarto las 5", settings) // 4:45
 ```
 
+### Portuguese Examples
+
+```go
+settings := &godateparser.Settings{
+    Languages: []string{"pt"},
+}
+
+// Months and weekdays
+godateparser.ParseDate("15 de junho de 2024", settings)  // June 15, 2024
+godateparser.ParseDate("25 dezembro 2024", settings)     // December 25, 2024
+godateparser.ParseDate("segunda-feira", settings)         // Next Monday
+godateparser.ParseDate("sexta", settings)                 // Next Friday
+
+// Simple relative dates
+godateparser.ParseDate("ontem", settings)      // Yesterday
+godateparser.ParseDate("hoje", settings)       // Today  
+godateparser.ParseDate("amanhã", settings)     // Tomorrow
+
+// Relative dates with time units
+godateparser.ParseDate("há 2 dias", settings)        // 2 days ago
+godateparser.ParseDate("há 1 semana", settings)      // 1 week ago
+godateparser.ParseDate("em 3 dias", settings)        // in 3 days
+godateparser.ParseDate("daqui a 2 semanas", settings) // in 2 weeks
+
+// Next/Last patterns
+godateparser.ParseDate("próxima segunda", settings)   // Next Monday
+godateparser.ParseDate("última sexta", settings)      // Last Friday
+godateparser.ParseDate("próximo mês", settings)       // Next month
+godateparser.ParseDate("último ano", settings)        // Last year
+
+// Time expressions
+godateparser.ParseDate("meio-dia", settings)      // 12:00
+godateparser.ParseDate("meia-noite", settings)    // 00:00
+godateparser.ParseDate("3 e meia", settings)      // 3:30
+
+// Works with or without accents
+godateparser.ParseDate("proximo mes", settings)   // Next month (no accent)
+godateparser.ParseDate("ultimo ano", settings)    // Last year (no accent)
+godateparser.ParseDate("ha 2 dias", settings)     // 2 days ago (no accent)
+```
+
 #### Mixed Language Usage
 
 ```go
@@ -543,6 +589,14 @@ godateparser.ParseDate("December 31, 2024", settings)  // English
 // Can even mix within same application
 godateparser.ParseDate("próximo lunes", settings)      // Spanish: next Monday
 godateparser.ParseDate("next Friday", settings)        // English: next Friday
+
+// Enable all three languages
+settings = &godateparser.Settings{
+    Languages: []string{"pt", "es", "en"},
+}
+godateparser.ParseDate("amanhã", settings)            // Portuguese: tomorrow
+godateparser.ParseDate("mañana", settings)            // Spanish: tomorrow  
+godateparser.ParseDate("tomorrow", settings)          // English: tomorrow
 ```
 
 ## Contributing
@@ -551,7 +605,7 @@ Contributions are welcome! Please feel free to submit issues, feature requests, 
 
 ### Adding New Languages
 
-Interested in adding support for French, German, Portuguese, or Chinese? Check out the `translations/` package for the translation infrastructure and Spanish implementation as a reference.
+Interested in adding support for French, German, Italian, or Chinese? Check out the `translations/` package for the translation infrastructure. Use the Spanish or Portuguese implementations as a reference.
 
 ## License
 
@@ -559,7 +613,7 @@ MIT License - see LICENSE file for details.
 
 ## Acknowledgments
 
-Inspired by the Python [dateparser](https://github.com/scrapinghub/dateparser) library.
+Special thanks to all contributors and users of this library.
 
 ## Contact
 

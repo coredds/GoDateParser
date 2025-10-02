@@ -4,10 +4,6 @@
 run:
   timeout: 5m
   tests: true
-  # Exclude examples directory
-  skip-dirs:
-    - examples
-    - bin
 
 issues:
   # Maximum issues count per one linter

@@ -39,13 +39,15 @@ jobs:
 
     - name: Run tests (with race detector)
       if: runner.os != 'Windows'
-      run: go test -v -race -coverprofile coverage.txt -covermode atomic ./...
+      run: go test -v -race -coverprofile coverage.txt -covermode atomic $(go list ./... | grep -v /examples)
       shell: bash
 
     - name: Run tests (without race detector on Windows)
       if: runner.os == 'Windows'
-      run: go test -v -coverprofile coverage.txt -covermode atomic ./...
-      shell: bash
+      run: |
+        $packages = go list ./... | Where-Object { $_ -notlike '*examples*' }
+        go test -v -coverprofile coverage.txt -covermode atomic $packages
+      shell: pwsh
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4

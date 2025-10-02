@@ -71,9 +71,12 @@ jobs:
         go-version: '1.23'
 
     - name: Run golangci-lint
-      run: |
-        curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
-        golangci-lint run --timeout=5m $(go list ./... | grep -v /examples)
+      uses: golangci/golangci-lint-action@v6
+      with:
+        version: v1.64.8
+        args: --timeout=5m
+        skip-pkg-cache: true
+        skip-build-cache: true
 
   security:
     name: Security Scan

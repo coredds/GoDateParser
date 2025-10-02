@@ -18,6 +18,8 @@ func init() {
 		GlobalRegistry.Register(NewSpanishTranslation())
 		GlobalRegistry.Register(NewPortugueseTranslation())
 		GlobalRegistry.Register(NewFrenchTranslation())
+		GlobalRegistry.Register(NewGermanTranslation())
+		GlobalRegistry.Register(NewChineseTranslation())
 	})
 }
 

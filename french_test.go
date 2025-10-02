@@ -300,11 +300,9 @@ func TestFrench_TimeExpressions(t *testing.T) {
 	}{
 		{"midi", "midi", 12, 0},
 		{"minuit", "minuit", 0, 0},
-		// Note: Complex time patterns like "15h30", "15h", and "3 heures 30" 
-		// require deeper parser modifications beyond simple translation support
-		// {"15h30", "15h30", 15, 30},
-		// {"15h", "15h", 15, 0},
-		// {"3 heures 30", "3 heures 30", 3, 30},
+		{"15h30", "15h30", 15, 30},
+		{"15h", "15h", 15, 0},
+		{"3 heures 30", "3 heures 30", 3, 30},
 	}
 
 	for _, tt := range tests {
@@ -338,9 +336,7 @@ func TestFrench_IncompleteDates(t *testing.T) {
 		wantMonth time.Month
 		wantDay   int
 	}{
-		// Note: Single month name "mai" is ambiguous with English "may"
-		// and the parser may default to the current year's May
-		// {"mai", "mai", 2024, time.May, 1},
+		{"mai", "mai", 2025, time.May, 1}, // May has passed (ref: June 15, 2024), so next May is 2025
 		{"décembre", "décembre", 2024, time.December, 1},
 		{"octobre", "octobre", 2024, time.October, 1},
 		{"juin 15", "juin 15", 2024, time.June, 15},
@@ -383,11 +379,9 @@ func TestFrench_OrdinalDates(t *testing.T) {
 		wantMonth time.Month
 		wantDay   int
 	}{
-		// Note: Incomplete dates without year (month + day only) require
-		// more complex year inference logic
-		// {"juin 3", "juin 3", 2024, time.June, 3},
-		// {"3 juin", "3 juin", 2024, time.June, 3},
-		// {"3 de juin", "3 de juin", 2024, time.June, 3},
+		{"juin 3", "juin 3", 2025, time.June, 3}, // June 3 has passed (ref: June 15, 2024), so next is 2025
+		{"3 juin", "3 juin", 2025, time.June, 3},
+		{"3 de juin", "3 de juin", 2025, time.June, 3},
 		{"décembre 31", "décembre 31", 2024, time.December, 31},
 		{"31 décembre", "31 décembre", 2024, time.December, 31},
 		{"31 de décembre", "31 de décembre", 2024, time.December, 31},
@@ -431,7 +425,9 @@ func TestFrench_ThisNextLast(t *testing.T) {
 		{"ce lundi", "ce lundi", time.Monday},
 		{"cet mercredi", "cet mercredi", time.Wednesday},
 		{"cette vendredi", "cette vendredi", time.Friday},
-		// Note: "cette semaine" (this week) requires period boundary parsing
+		// Note: "this week" / "cette semaine" is not currently supported
+		// The parser supports "this + weekday" but not "this + period"
+		// This would require adding support for period boundary expressions in parser_relative_extended.go
 		// {"cette semaine", "cette semaine", time.Saturday},
 	}
 

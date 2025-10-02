@@ -312,6 +312,16 @@ func tryParseMultiLangTime(ctx *parserContext, input string) (time.Time, error) 
 		if result, err := tryParseMenosCuarto(ctx, input, lang); err == nil {
 			return result, nil
 		}
+
+		// Try "15h30" or "15h" patterns - French time format
+		if result, err := tryParseFrenchHFormat(ctx, input, lang); err == nil {
+			return result, nil
+		}
+
+		// Try "3 heures 30" patterns - French "hours minutes"
+		if result, err := tryParseFrenchHeures(ctx, input, lang); err == nil {
+			return result, nil
+		}
 	}
 
 	return time.Time{}, fmt.Errorf("no multi-language time pattern matched")
@@ -454,6 +464,64 @@ func tryParseMenosCuarto(ctx *parserContext, input string, lang *translations.La
 				base := ctx.settings.RelativeBase
 				return time.Date(base.Year(), base.Month(), base.Day(), hour, minute, 0, 0, base.Location()), nil
 			}
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("no match")
+}
+// tryParseFrenchHFormat parses French "15h30" or "15h" format
+func tryParseFrenchHFormat(ctx *parserContext, input string, lang *translations.Language) (time.Time, error) {
+	// Pattern: "15h30" or "15h" (h is the separator)
+	pattern := `^(\d{1,2})h(\d{2})?$`
+	re := regexp.MustCompile(pattern)
+
+	if matches := re.FindStringSubmatch(input); matches != nil {
+		hour, _ := strconv.Atoi(matches[1])
+		minute := 0
+		if matches[2] != "" {
+			minute, _ = strconv.Atoi(matches[2])
+		}
+
+		// Validate time components
+		if err := validateTime(hour, minute, 0); err != nil {
+			return time.Time{}, err
+		}
+
+		base := ctx.settings.RelativeBase
+		return time.Date(base.Year(), base.Month(), base.Day(), hour, minute, 0, 0, base.Location()), nil
+	}
+
+	return time.Time{}, fmt.Errorf("no match")
+}
+
+// tryParseFrenchHeures parses French "3 heures 30" format
+func tryParseFrenchHeures(ctx *parserContext, input string, lang *translations.Language) (time.Time, error) {
+	if lang.TimeTerms == nil {
+		return time.Time{}, fmt.Errorf("no time terms")
+	}
+
+	// Try with "heure" or "heures" from OClock terms
+	for _, oclockTerm := range lang.TimeTerms.OClock {
+		if oclockTerm == "" {
+			continue
+		}
+
+		// Pattern: "3 heures 30" or "3 heure 30"
+		pattern := fmt.Sprintf(`^(\d{1,2})\s+%s\s+(\d{1,2})$`,
+			regexp.QuoteMeta(strings.ToLower(oclockTerm)))
+		re := regexp.MustCompile(pattern)
+
+		if matches := re.FindStringSubmatch(input); matches != nil {
+			hour, _ := strconv.Atoi(matches[1])
+			minute, _ := strconv.Atoi(matches[2])
+
+			// Validate time components
+			if err := validateTime(hour, minute, 0); err != nil {
+				return time.Time{}, err
+			}
+
+			base := ctx.settings.RelativeBase
+			return time.Date(base.Year(), base.Month(), base.Day(), hour, minute, 0, 0, base.Location()), nil
 		}
 	}
 

@@ -17,6 +17,15 @@ issues:
     - path: examples
       linters:
         - typecheck
+    # False positive: "may" appears twice because it's both the full month name and abbreviation
+    - path: parser_ordinal.go
+      linters:
+        - gocritic
+      text: "badRegexp.*may.*is duplicated"
+    # False positive: "decembre" is correct French spelling, not a typo of English "december"
+    - linters:
+        - misspell
+      text: "decembre.*misspelling.*december"
 
 linters:
   enable:

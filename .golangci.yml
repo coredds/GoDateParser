@@ -39,9 +39,23 @@ linters-settings:
     check-type-assertions: false
     check-blank: false
   govet:
-    settings:
-      shadow:
-        strict: false
+    enable-all: false
+    enable:
+      - assign
+      - atomic
+      - bools
+      - buildtag
+      - copylocks
+      - errorsas
+      - httpresponse
+      - nilfunc
+      - printf
+      - stdmethods
+      - structtag
+      - tests
+      - unmarshal
+      - unreachable
+      - unusedresult
   staticcheck:
     checks: ["all"]
   gocritic:

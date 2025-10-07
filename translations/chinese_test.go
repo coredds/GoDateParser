@@ -1,18 +1,20 @@
-package godateparser
+package translations_test
 
 import (
 	"testing"
 	"time"
+
+	"github.com/coredds/godateparser"
 )
 
-func TestJapanese_Months(t *testing.T) {
+func TestChinese_Months(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
-		Languages:    []string{"ja", "en"},
+		Languages:    []string{"zh", "en"},
 	}
 
-	// Note: Japanese date formats like "2024年12月31日" require custom parser support
+	// Note: Chinese date formats like "2024年12月31日" require custom parser support
 	// For now, testing month-only patterns which work with existing parsers
 	tests := []struct {
 		name      string
@@ -24,14 +26,13 @@ func TestJapanese_Months(t *testing.T) {
 		{"12月 (month only)", "12月", 2024, time.December, 1},
 		{"1月 (month only)", "1月", 2025, time.January, 1},
 		{"10月 (month only)", "10月", 2024, time.October, 1},
-		{"5月 (month only)", "5月", 2025, time.May, 1},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Year() != tt.wantYear {
@@ -47,11 +48,11 @@ func TestJapanese_Months(t *testing.T) {
 	}
 }
 
-func TestJapanese_Weekdays(t *testing.T) {
+func TestChinese_Weekdays(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC) // Saturday
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
-		Languages:    []string{"ja", "en"},
+		Languages:    []string{"zh", "en"},
 	}
 
 	tests := []struct {
@@ -59,29 +60,28 @@ func TestJapanese_Weekdays(t *testing.T) {
 		input       string
 		wantWeekday time.Weekday
 	}{
-		// Full forms with 曜日 (youbi)
-		{"月曜日", "月曜日", time.Monday},
-		{"火曜日", "火曜日", time.Tuesday},
-		{"水曜日", "水曜日", time.Wednesday},
-		{"木曜日", "木曜日", time.Thursday},
-		{"金曜日", "金曜日", time.Friday},
-		{"土曜日", "土曜日", time.Saturday},
-		{"日曜日", "日曜日", time.Sunday},
-		// Short forms without 日
-		{"月曜", "月曜", time.Monday},
-		{"火曜", "火曜", time.Tuesday},
-		{"水曜", "水曜", time.Wednesday},
-		{"木曜", "木曜", time.Thursday},
-		{"金曜", "金曜", time.Friday},
-		{"土曜", "土曜", time.Saturday},
-		{"日曜", "日曜", time.Sunday},
+		{"星期一", "星期一", time.Monday},
+		{"星期二", "星期二", time.Tuesday},
+		{"星期三", "星期三", time.Wednesday},
+		{"星期四", "星期四", time.Thursday},
+		{"星期五", "星期五", time.Friday},
+		{"星期六", "星期六", time.Saturday},
+		{"星期日", "星期日", time.Sunday},
+		// Short forms
+		{"周一", "周一", time.Monday},
+		{"周二", "周二", time.Tuesday},
+		{"周三", "周三", time.Wednesday},
+		{"周四", "周四", time.Thursday},
+		{"周五", "周五", time.Friday},
+		{"周六", "周六", time.Saturday},
+		{"周日", "周日", time.Sunday},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Weekday() != tt.wantWeekday {
@@ -91,11 +91,11 @@ func TestJapanese_Weekdays(t *testing.T) {
 	}
 }
 
-func TestJapanese_RelativeSimple(t *testing.T) {
+func TestChinese_RelativeSimple(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
-		Languages:    []string{"ja", "en"},
+		Languages:    []string{"zh", "en"},
 	}
 
 	tests := []struct {
@@ -104,16 +104,16 @@ func TestJapanese_RelativeSimple(t *testing.T) {
 		wantYear int
 		wantDay  int
 	}{
-		{"昨日 (kinou)", "昨日", 2024, 14},
-		{"今日 (kyou)", "今日", 2024, 15},
-		{"明日 (ashita)", "明日", 2024, 16},
+		{"昨天", "昨天", 2024, 14},
+		{"今天", "今天", 2024, 15},
+		{"明天", "明天", 2024, 16},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Year() != tt.wantYear {
@@ -126,11 +126,11 @@ func TestJapanese_RelativeSimple(t *testing.T) {
 	}
 }
 
-func TestJapanese_RelativeAgo(t *testing.T) {
+func TestChinese_RelativeAgo(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
-		Languages:    []string{"ja", "en"},
+		Languages:    []string{"zh", "en"},
 	}
 
 	tests := []struct {
@@ -139,18 +139,17 @@ func TestJapanese_RelativeAgo(t *testing.T) {
 		wantYear int
 		wantDay  int
 	}{
-		{"1日前", "1日前", 2024, 14},
-		{"2日前", "2日前", 2024, 13},
-		{"1週前", "1週前", 2024, 8},
-		{"2週前", "2週前", 2024, 1},
-		{"1ヶ月前", "1ヶ月前", 2024, 15}, // May 15
+		{"1天前", "1天前", 2024, 14},
+		{"2天前", "2天前", 2024, 13},
+		{"1周前", "1周前", 2024, 8},
+		{"2周前", "2周前", 2024, 1},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Year() != tt.wantYear {
@@ -163,11 +162,11 @@ func TestJapanese_RelativeAgo(t *testing.T) {
 	}
 }
 
-func TestJapanese_RelativeIn(t *testing.T) {
+func TestChinese_RelativeIn(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
-		Languages:    []string{"ja", "en"},
+		Languages:    []string{"zh", "en"},
 	}
 
 	tests := []struct {
@@ -176,17 +175,17 @@ func TestJapanese_RelativeIn(t *testing.T) {
 		wantYear int
 		wantDay  int
 	}{
-		{"1日後", "1日後", 2024, 16},
-		{"2日後", "2日後", 2024, 17},
-		{"1週後", "1週後", 2024, 22},
-		{"2週後", "2週後", 2024, 29},
+		{"1天后", "1天后", 2024, 16},
+		{"2天后", "2天后", 2024, 17},
+		{"1周后", "1周后", 2024, 22},
+		{"2周后", "2周后", 2024, 29},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Year() != tt.wantYear {
@@ -199,11 +198,11 @@ func TestJapanese_RelativeIn(t *testing.T) {
 	}
 }
 
-func TestJapanese_RelativeNextLast(t *testing.T) {
+func TestChinese_RelativeNextLast(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
-		Languages:    []string{"ja", "en"},
+		Languages:    []string{"zh", "en"},
 	}
 
 	tests := []struct {
@@ -213,17 +212,17 @@ func TestJapanese_RelativeNextLast(t *testing.T) {
 		wantMonth time.Month
 		wantDay   int
 	}{
-		{"来週", "来週", 2024, time.June, 22},
-		{"先週", "先週", 2024, time.June, 8},
-		{"来月", "来月", 2024, time.July, 15},
-		{"先月", "先月", 2024, time.May, 15},
+		{"下周", "下周", 2024, time.June, 22},
+		{"上周", "上周", 2024, time.June, 8},
+		{"下月", "下月", 2024, time.July, 15}, // Using 下月 instead of 下个月
+		{"上月", "上月", 2024, time.May, 15},  // Using 上月 instead of 上个月
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Year() != tt.wantYear {
@@ -239,11 +238,11 @@ func TestJapanese_RelativeNextLast(t *testing.T) {
 	}
 }
 
-func TestJapanese_WeekdaysWithModifiers(t *testing.T) {
+func TestChinese_WeekdaysWithModifiers(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC) // Saturday
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
-		Languages:    []string{"ja", "en"},
+		Languages:    []string{"zh", "en"},
 	}
 
 	tests := []struct {
@@ -252,19 +251,19 @@ func TestJapanese_WeekdaysWithModifiers(t *testing.T) {
 		wantWeekday time.Weekday
 		wantDay     int
 	}{
-		{"来週月曜", "来週月曜", time.Monday, 17},   // Next week Monday (June 17-23)
-		{"先週月曜", "先週月曜", time.Monday, 3},    // Last week Monday (June 3-9)
-		{"来週金曜", "来週金曜", time.Friday, 21},   // Next week Friday
-		{"先週金曜", "先週金曜", time.Friday, 7},    // Last week Friday
-		{"来週月曜日", "来週月曜日", time.Monday, 17}, // With 日 suffix
-		{"先週金曜日", "先週金曜日", time.Friday, 7},  // With 日 suffix
+		{"下周一", "下周一", time.Monday, 17},   // Next week Monday (using 周) - June 17-23
+		{"上周一", "上周一", time.Monday, 3},    // Last week Monday (using 周) - June 3-9
+		{"下周五", "下周五", time.Friday, 21},   // Next week Friday
+		{"上周五", "上周五", time.Friday, 7},    // Last week Friday
+		{"下星期一", "下星期一", time.Monday, 17}, // Next week Monday (using 星期)
+		{"上星期五", "上星期五", time.Friday, 7},  // Last week Friday (using 星期)
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Weekday() != tt.wantWeekday {
@@ -277,11 +276,11 @@ func TestJapanese_WeekdaysWithModifiers(t *testing.T) {
 	}
 }
 
-func TestJapanese_TimeExpressions(t *testing.T) {
+func TestChinese_TimeExpressions(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
-		Languages:    []string{"ja", "en"},
+		Languages:    []string{"zh", "en"},
 	}
 
 	tests := []struct {
@@ -290,16 +289,16 @@ func TestJapanese_TimeExpressions(t *testing.T) {
 		wantHour int
 		wantMin  int
 	}{
-		{"正午 (shougo - noon)", "正午", 12, 0},
-		{"真夜中 (mayonaka - midnight)", "真夜中", 0, 0},
+		{"中午", "中午", 12, 0},
+		{"午夜", "午夜", 0, 0},
 		{"15:30", "15:30", 15, 30},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Hour() != tt.wantHour {
@@ -312,11 +311,11 @@ func TestJapanese_TimeExpressions(t *testing.T) {
 	}
 }
 
-func TestJapanese_IncompleteDates(t *testing.T) {
+func TestChinese_IncompleteDates(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
-		Languages:    []string{"ja", "en"},
+		Languages:    []string{"zh", "en"},
 	}
 
 	tests := []struct {
@@ -329,14 +328,13 @@ func TestJapanese_IncompleteDates(t *testing.T) {
 		{"5月", "5月", 2025, time.May, 1},
 		{"12月", "12月", 2024, time.December, 1},
 		{"10月", "10月", 2024, time.October, 1},
-		{"1月", "1月", 2025, time.January, 1},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Year() != tt.wantYear {
@@ -352,11 +350,11 @@ func TestJapanese_IncompleteDates(t *testing.T) {
 	}
 }
 
-func TestJapanese_JapaneseSpecific(t *testing.T) {
+func TestChinese_ChineseSpecific(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
-		Languages:    []string{"ja", "en"},
+		Languages:    []string{"zh", "en"},
 	}
 
 	tests := []struct {
@@ -373,9 +371,9 @@ func TestJapanese_JapaneseSpecific(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Year() != tt.wantYear {
@@ -391,11 +389,11 @@ func TestJapanese_JapaneseSpecific(t *testing.T) {
 	}
 }
 
-func TestJapanese_MixedWithEnglish(t *testing.T) {
+func TestChinese_MixedWithEnglish(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
-		Languages:    []string{"ja", "en"},
+		Languages:    []string{"zh", "en"},
 	}
 
 	tests := []struct {
@@ -406,19 +404,17 @@ func TestJapanese_MixedWithEnglish(t *testing.T) {
 		wantDay   int
 	}{
 		{"December 15 2024", "December 15 2024", 2024, time.December, 15},
-		{"昨日", "昨日", 2024, time.June, 14},
+		{"昨天", "昨天", 2024, time.June, 14},
 		{"yesterday", "yesterday", 2024, time.June, 14},
-		{"今日", "今日", 2024, time.June, 15},
+		{"今天", "今天", 2024, time.June, 15},
 		{"today", "today", 2024, time.June, 15},
-		{"明日", "明日", 2024, time.June, 16},
-		{"tomorrow", "tomorrow", 2024, time.June, 16},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Year() != tt.wantYear {
@@ -434,11 +430,11 @@ func TestJapanese_MixedWithEnglish(t *testing.T) {
 	}
 }
 
-func TestJapanese_AlternativeWeekdays(t *testing.T) {
+func TestChinese_AlternativeWeekdays(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC) // Saturday
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
-		Languages:    []string{"ja", "en"},
+		Languages:    []string{"zh", "en"},
 	}
 
 	tests := []struct {
@@ -446,64 +442,22 @@ func TestJapanese_AlternativeWeekdays(t *testing.T) {
 		input       string
 		wantWeekday time.Weekday
 	}{
-		{"月曜 (short)", "月曜", time.Monday},
-		{"火曜 (short)", "火曜", time.Tuesday},
-		{"水曜 (short)", "水曜", time.Wednesday},
-		{"木曜 (short)", "木曜", time.Thursday},
-		{"金曜 (short)", "金曜", time.Friday},
-		{"土曜 (short)", "土曜", time.Saturday},
-		{"日曜 (short)", "日曜", time.Sunday},
+		{"礼拜一", "礼拜一", time.Monday},
+		{"礼拜二", "礼拜二", time.Tuesday},
+		{"礼拜三", "礼拜三", time.Wednesday},
+		{"礼拜日", "礼拜日", time.Sunday},
+		{"星期天", "星期天", time.Sunday},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Weekday() != tt.wantWeekday {
 				t.Errorf("Weekday = %v, want %v", result.Weekday(), tt.wantWeekday)
-			}
-		})
-	}
-}
-
-func TestJapanese_KanjiAndHiragana(t *testing.T) {
-	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
-		RelativeBase: refTime,
-		Languages:    []string{"ja", "en"},
-	}
-
-	tests := []struct {
-		name      string
-		input     string
-		wantYear  int
-		wantMonth time.Month
-		wantDay   int
-	}{
-		// Kanji forms (most common)
-		{"昨日 (kanji)", "昨日", 2024, time.June, 14},
-		{"今日 (kanji)", "今日", 2024, time.June, 15},
-		{"明日 (kanji)", "明日", 2024, time.June, 16},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
-			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
-				return
-			}
-			if result.Year() != tt.wantYear {
-				t.Errorf("Year = %v, want %v", result.Year(), tt.wantYear)
-			}
-			if result.Month() != tt.wantMonth {
-				t.Errorf("Month = %v, want %v", result.Month(), tt.wantMonth)
-			}
-			if result.Day() != tt.wantDay {
-				t.Errorf("Day = %v, want %v", result.Day(), tt.wantDay)
 			}
 		})
 	}

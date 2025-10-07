@@ -319,9 +319,29 @@ func tryParseMultiLangMonthName(ctx *parserContext, input string) (time.Time, er
 				return day, month, year, nil
 			},
 		},
+		// "15 di marzo di 2024" (Italian with two "di")
+		{
+			regex: regexp.MustCompile(fmt.Sprintf(`(?i)^(\d{1,2})\s+di\s+(%s)\s+di\s+(\d{2,4})$`, monthPattern)),
+			parse: func(matches []string) (int, time.Month, int, error) {
+				day, _ := strconv.Atoi(matches[1])
+				month := monthNameToNumberWithLangs(matches[2], ctx.languages)
+				year, _ := strconv.Atoi(matches[3])
+				return day, month, year, nil
+			},
+		},
 		// "3 de junio 2024" (Spanish with one "de")
 		{
 			regex: regexp.MustCompile(fmt.Sprintf(`(?i)^(\d{1,2})\s+de\s+(%s)\s+(\d{2,4})$`, monthPattern)),
+			parse: func(matches []string) (int, time.Month, int, error) {
+				day, _ := strconv.Atoi(matches[1])
+				month := monthNameToNumberWithLangs(matches[2], ctx.languages)
+				year, _ := strconv.Atoi(matches[3])
+				return day, month, year, nil
+			},
+		},
+		// "3 di giugno 2024" (Italian with one "di")
+		{
+			regex: regexp.MustCompile(fmt.Sprintf(`(?i)^(\d{1,2})\s+di\s+(%s)\s+(\d{2,4})$`, monthPattern)),
 			parse: func(matches []string) (int, time.Month, int, error) {
 				day, _ := strconv.Atoi(matches[1])
 				month := monthNameToNumberWithLangs(matches[2], ctx.languages)
@@ -337,6 +357,16 @@ func tryParseMultiLangMonthName(ctx *parserContext, input string) (time.Time, er
 				day, _ := strconv.Atoi(matches[2])
 				year, _ := strconv.Atoi(matches[3])
 				return day, month, year, nil
+			},
+		},
+		// "март 2024", "December 2024" (Month + Year only, defaults to 1st of month)
+		// Note: Requires 4 digits to avoid ambiguity with "June 15" (month + day)
+		{
+			regex: regexp.MustCompile(fmt.Sprintf(`(?i)^(%s)\s+(\d{4})$`, monthPattern)),
+			parse: func(matches []string) (int, time.Month, int, error) {
+				month := monthNameToNumberWithLangs(matches[1], ctx.languages)
+				year, _ := strconv.Atoi(matches[2])
+				return 1, month, year, nil // Default to 1st of the month
 			},
 		},
 	}

@@ -368,8 +368,8 @@ func tryParsePeriodBoundary(ctx *parserContext, input string, lang *translations
 
 	// Try "beginning/start/end of month/year/week"
 	periods := map[string]string{
+		// Spanish
 		"mes":     "month",
-		"mês":     "month", // Portuguese
 		"meses":   "month",
 		"año":     "year",
 		"ano":     "year",
@@ -377,16 +377,55 @@ func tryParsePeriodBoundary(ctx *parserContext, input string, lang *translations
 		"años":    "year",
 		"semana":  "week",
 		"semanas": "week",
-		"month":   "month",
-		"year":    "year",
-		"week":    "week",
-		"mois":    "month", // French
+		// Portuguese
+		"mês": "month",
+		// French
+		"mois":    "month",
+		"semaine": "week",
+		"année":   "year",
+		"annee":   "year",
+		// German
+		"monat":   "month",
+		"monate":  "month",
+		"monaten": "month",
+		"jahr":    "year",
+		"jahre":   "year",
+		"jahren":  "year",
+		"woche":   "week",
+		"wochen":  "week",
+		// Italian
+		"mese":      "month",
+		"mesi":      "month",
+		"anno":      "year",
+		"anni":      "year",
+		"settimana": "week",
+		"settimane": "week",
+		// Dutch
+		"maand":   "month",
+		"maanden": "month",
+		"jaar":    "year", // Dutch jaar (same spelling as German)
+		"weken":   "week",
+		// Russian
+		"месяц":   "month",
+		"месяца":  "month",
+		"месяцев": "month",
+		"год":     "year",
+		"года":    "year",
+		"лет":     "year",
+		"неделя":  "week",
+		"недели":  "week",
+		"недель":  "week",
+		"неделю":  "week", // Accusative case
+		// English
+		"month": "month",
+		"year":  "year",
+		"week":  "week",
 	}
 
 	for periodEs, periodEn := range periods {
-		// Try "comienzo de mes"
+		// Try "comienzo de mes" (Spanish/Portuguese/French: de, Italian: di, Dutch: van, Russian: no preposition)
 		for _, beginTerm := range beginTerms {
-			pattern := fmt.Sprintf(`^%s\s+(de\s+)?%s$`, regexp.QuoteMeta(beginTerm), regexp.QuoteMeta(periodEs))
+			pattern := fmt.Sprintf(`^%s\s+(de\s+|di\s+|van\s+)?%s$`, regexp.QuoteMeta(beginTerm), regexp.QuoteMeta(periodEs))
 			if matched, _ := regexp.MatchString(pattern, input); matched {
 				return getStartOfPeriod(base, periodEn), nil
 			}
@@ -394,7 +433,7 @@ func tryParsePeriodBoundary(ctx *parserContext, input string, lang *translations
 
 		// Try "fin de mes"
 		for _, endTerm := range endTerms {
-			pattern := fmt.Sprintf(`^%s\s+(de\s+)?%s$`, regexp.QuoteMeta(endTerm), regexp.QuoteMeta(periodEs))
+			pattern := fmt.Sprintf(`^%s\s+(de\s+|di\s+|van\s+)?%s$`, regexp.QuoteMeta(endTerm), regexp.QuoteMeta(periodEs))
 			if matched, _ := regexp.MatchString(pattern, input); matched {
 				return getEndOfPeriod(base, periodEn), nil
 			}
@@ -407,9 +446,9 @@ func tryParsePeriodBoundary(ctx *parserContext, input string, lang *translations
 				return addPeriod(base, periodEn, 1), nil
 			}
 
-			// "comienzo de próximo mes"
+			// "comienzo de próximo mes" (with various prepositions)
 			for _, beginTerm := range beginTerms {
-				pattern := fmt.Sprintf(`^%s\s+(de\s+)?%s\s+%s$`, regexp.QuoteMeta(beginTerm), regexp.QuoteMeta(nextTerm), regexp.QuoteMeta(periodEs))
+				pattern := fmt.Sprintf(`^%s\s+(de\s+|di\s+|van\s+)?%s\s+%s$`, regexp.QuoteMeta(beginTerm), regexp.QuoteMeta(nextTerm), regexp.QuoteMeta(periodEs))
 				if matched, _ := regexp.MatchString(pattern, input); matched {
 					nextPeriod := addPeriod(base, periodEn, 1)
 					return getStartOfPeriod(nextPeriod, periodEn), nil
@@ -418,7 +457,7 @@ func tryParsePeriodBoundary(ctx *parserContext, input string, lang *translations
 
 			// "fin de próximo mes"
 			for _, endTerm := range endTerms {
-				pattern := fmt.Sprintf(`^%s\s+(de\s+)?%s\s+%s$`, regexp.QuoteMeta(endTerm), regexp.QuoteMeta(nextTerm), regexp.QuoteMeta(periodEs))
+				pattern := fmt.Sprintf(`^%s\s+(de\s+|di\s+|van\s+)?%s\s+%s$`, regexp.QuoteMeta(endTerm), regexp.QuoteMeta(nextTerm), regexp.QuoteMeta(periodEs))
 				if matched, _ := regexp.MatchString(pattern, input); matched {
 					nextPeriod := addPeriod(base, periodEn, 1)
 					return getEndOfPeriod(nextPeriod, periodEn), nil
@@ -432,9 +471,9 @@ func tryParsePeriodBoundary(ctx *parserContext, input string, lang *translations
 				return addPeriod(base, periodEn, -1), nil
 			}
 
-			// "comienzo de último mes"
+			// "comienzo de último mes" (with various prepositions)
 			for _, beginTerm := range beginTerms {
-				pattern := fmt.Sprintf(`^%s\s+(de\s+)?%s\s+%s$`, regexp.QuoteMeta(beginTerm), regexp.QuoteMeta(lastTerm), regexp.QuoteMeta(periodEs))
+				pattern := fmt.Sprintf(`^%s\s+(de\s+|di\s+|van\s+)?%s\s+%s$`, regexp.QuoteMeta(beginTerm), regexp.QuoteMeta(lastTerm), regexp.QuoteMeta(periodEs))
 				if matched, _ := regexp.MatchString(pattern, input); matched {
 					lastPeriod := addPeriod(base, periodEn, -1)
 					return getStartOfPeriod(lastPeriod, periodEn), nil
@@ -443,7 +482,7 @@ func tryParsePeriodBoundary(ctx *parserContext, input string, lang *translations
 
 			// "fin de último mes"
 			for _, endTerm := range endTerms {
-				pattern := fmt.Sprintf(`^%s\s+(de\s+)?%s\s+%s$`, regexp.QuoteMeta(endTerm), regexp.QuoteMeta(lastTerm), regexp.QuoteMeta(periodEs))
+				pattern := fmt.Sprintf(`^%s\s+(de\s+|di\s+|van\s+)?%s\s+%s$`, regexp.QuoteMeta(endTerm), regexp.QuoteMeta(lastTerm), regexp.QuoteMeta(periodEs))
 				if matched, _ := regexp.MatchString(pattern, input); matched {
 					lastPeriod := addPeriod(base, periodEn, -1)
 					return getEndOfPeriod(lastPeriod, periodEn), nil
@@ -476,8 +515,8 @@ func tryParseThisNextLast(ctx *parserContext, input string, lang *translations.L
 
 		// "this month/year/week" / "este mes/año/semana"
 		periods := map[string]string{
+			// Spanish
 			"mes":     "month",
-			"mês":     "month", // Portuguese
 			"meses":   "month",
 			"año":     "year",
 			"ano":     "year",
@@ -485,8 +524,47 @@ func tryParseThisNextLast(ctx *parserContext, input string, lang *translations.L
 			"años":    "year",
 			"semana":  "week",
 			"semanas": "week",
-			"semaine": "week",  // French
-			"mois":    "month", // French
+			// Portuguese
+			"mês": "month",
+			// French
+			"semaine": "week",
+			"mois":    "month",
+			"année":   "year",
+			"annee":   "year",
+			// German
+			"monat":   "month",
+			"monate":  "month",
+			"monaten": "month",
+			"jahr":    "year",
+			"jahre":   "year",
+			"jahren":  "year",
+			"woche":   "week",
+			"wochen":  "week",
+			// Italian
+			"mese":      "month",
+			"mesi":      "month",
+			"anno":      "year",
+			"anni":      "year",
+			"settimana": "week",
+			"settimane": "week",
+			// Dutch
+			"maand":   "month",
+			"maanden": "month",
+			"weken":   "week",
+			// Russian
+			"месяц":   "month",
+			"месяца":  "month",
+			"месяцев": "month",
+			"год":     "year",
+			"года":    "year",
+			"лет":     "year",
+			"неделя":  "week",
+			"недели":  "week",
+			"недель":  "week",
+			// English
+			"month": "month",
+			"year":  "year",
+			"week":  "week",
 		}
 		for periodEs, periodEn := range periods {
 			pattern := fmt.Sprintf(`^%s\s+%s$`, regexp.QuoteMeta(thisTerm), regexp.QuoteMeta(periodEs))

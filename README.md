@@ -12,7 +12,7 @@ A powerful Go library for parsing human-readable date strings in multiple format
 
 ## Features
 
-godateparser v1.3.1 supports **English**, **Spanish**, **Portuguese (Brazil)**, **French (France)**, **German (Germany)**, **Chinese Simplified (China)**, and **Japanese (Japan)** with comprehensive date parsing capabilities.
+godateparser v1.3.1 supports **English**, **Spanish**, **Portuguese (Brazil)**, **French (France)**, **German (Germany)**, **Italian (Italy)**, **Dutch (Netherlands)**, **Russian (Russia)**, **Chinese Simplified (China)**, and **Japanese (Japan)** with comprehensive date parsing capabilities.
 
 ### Core Parsing
 - **Absolute Dates**: ISO 8601, numeric formats (MDY/DMY/YMD), month names, two-digit years
@@ -23,7 +23,7 @@ godateparser v1.3.1 supports **English**, **Spanish**, **Portuguese (Brazil)**, 
 - **Date Ranges**: From/to patterns, duration ranges (next 7 days, last 2 weeks)
 
 ### Advanced Features
-- **Multi-Language Support**: English (en), Spanish (es), Portuguese (pt), French (fr), German (de), Chinese Simplified (zh), and Japanese (ja) with automatic detection
+- **Multi-Language Support**: English (en), Spanish (es), Portuguese (pt), French (fr), German (de), Italian (it), Dutch (nl), Russian (ru), Chinese Simplified (zh), and Japanese (ja) with automatic detection
 - **Timezone Support**: 30+ abbreviations, offsets, DST-aware via IANA database
 - **Incomplete Dates**: Year-only, month-only, month+day without year
 - **Ordinal Dates**: 1st, 2nd, 3rd, 21st with full/abbreviated month names
@@ -32,7 +32,7 @@ godateparser v1.3.1 supports **English**, **Spanish**, **Portuguese (Brazil)**, 
 - **PREFER_DATES_FROM**: Future/past disambiguation for ambiguous dates
 
 ### Quality & Performance
-- **Comprehensive**: 950+ test cases covering all scenarios (English + Spanish + Portuguese + French + German + Chinese + Japanese)
+- **Comprehensive**: 1200+ test cases covering all scenarios (English + Spanish + Portuguese + French + German + Italian + Dutch + Russian + Chinese + Japanese)
 - **Fast**: Sub-50μs parsing for most operations
 - **Robust**: Custom error types with helpful suggestions
 - **Flexible**: Extensive customization options
@@ -392,6 +392,9 @@ godateparser supports multiple languages with automatic detection or explicit se
 - **Portuguese (pt)**: Full support for all features (Brazilian Portuguese)
 - **French (fr)**: Full support for all features (France)
 - **German (de)**: Full support for all features (Germany)
+- **Italian (it)**: Full support for all features (Italy)
+- **Dutch (nl)**: Full support for all features (Netherlands)
+- **Russian (ru)**: Full support for all features with Cyrillic script and grammatical cases
 - **Chinese Simplified (zh)**: Full support including YYYY年MM月DD日 format, relative patterns (3天前, 2周后), next/last (下周, 上月)
 - **Japanese (ja)**: Full support including YYYY年MM月DD日 format, relative patterns (3日前, 2週後), next/last (来週, 先月)
 
@@ -406,6 +409,9 @@ godateparser.ParseDate("31 diciembre 2024", nil)  // Spanish
 godateparser.ParseDate("31 dezembro 2024", nil)   // Portuguese
 godateparser.ParseDate("31 décembre 2024", nil)   // French
 godateparser.ParseDate("31 Dezember 2024", nil)   // German
+godateparser.ParseDate("31 dicembre 2024", nil)   // Italian
+godateparser.ParseDate("31 december 2024", nil)   // Dutch
+godateparser.ParseDate("31 декабря 2024", nil)    // Russian
 godateparser.ParseDate("星期一", nil)               // Chinese (Monday)
 godateparser.ParseDate("月曜日", nil)               // Japanese (Monday)
 ```
@@ -419,48 +425,22 @@ settings := &godateparser.Settings{
 }
 godateparser.ParseDate("31 diciembre 2024", settings)
 
-// Parse only English
-settings = &godateparser.Settings{
-    Languages: []string{"en"},
-}
-godateparser.ParseDate("December 31, 2024", settings)
-
 // Enable multiple languages with priority
-settings = &godateparser.Settings{
-    Languages: []string{"pt", "en"},  // Try Portuguese first, then English
-}
-godateparser.ParseDate("15 junho 2024", settings)   // Portuguese
-godateparser.ParseDate("June 15, 2024", settings)    // English
-
-// Mix all three languages
 settings = &godateparser.Settings{
     Languages: []string{"es", "en"}, // Try Spanish first, then English
 }
-godateparser.ParseDate("31 diciembre 2024", settings)  // Works
-godateparser.ParseDate("December 31, 2024", settings)  // Works
+godateparser.ParseDate("31 diciembre 2024", settings)  // Spanish
+godateparser.ParseDate("December 31, 2024", settings)  // English
+
+// Enable all languages
+settings = &godateparser.Settings{
+    Languages: []string{"ja", "zh", "ru", "nl", "it", "de", "fr", "pt", "es", "en"},
+}
 ```
 
-### Spanish Examples
+### Example: Spanish Language Support
 
-#### Absolute Dates
-
-```go
-settings := &godateparser.Settings{Languages: []string{"es"}}
-
-// Month names
-godateparser.ParseDate("31 diciembre 2024", settings)
-godateparser.ParseDate("15 de marzo de 2024", settings)
-godateparser.ParseDate("marzo 15 2024", settings)
-
-// Abbreviated months
-godateparser.ParseDate("25 dic 2024", settings)
-godateparser.ParseDate("15 mar 2024", settings)
-
-// Without accents (also supported)
-godateparser.ParseDate("31 de diciembre de 2024", settings)
-```
-
-#### Relative Dates
+Spanish demonstrates the multi-language capabilities with full support for gender variations, accent-optional parsing, and natural expressions.
 
 ```go
 settings := &godateparser.Settings{
@@ -468,361 +448,30 @@ settings := &godateparser.Settings{
     RelativeBase: time.Now(),
 }
 
-// Simple terms
+// Absolute dates
+godateparser.ParseDate("31 diciembre 2024", settings)
+godateparser.ParseDate("15 de marzo de 2024", settings)
+
+// Simple relative terms
 godateparser.ParseDate("ayer", settings)      // yesterday
 godateparser.ParseDate("hoy", settings)       // today
 godateparser.ParseDate("mañana", settings)    // tomorrow
 
-// Ago patterns
+// Time-based patterns
 godateparser.ParseDate("hace 2 días", settings)     // 2 days ago
-godateparser.ParseDate("hace 1 semana", settings)   // 1 week ago
-godateparser.ParseDate("hace 3 meses", settings)    // 3 months ago
-
-// Future patterns
-godateparser.ParseDate("en 3 días", settings)       // in 3 days
-godateparser.ParseDate("en 2 semanas", settings)    // in 2 weeks
-godateparser.ParseDate("dentro de 1 mes", settings) // in 1 month
-
-// Weekdays
-godateparser.ParseDate("lunes", settings)           // Monday
+godateparser.ParseDate("en 3 semanas", settings)    // in 3 weeks
 godateparser.ParseDate("próximo viernes", settings) // next Friday
-godateparser.ParseDate("último martes", settings)   // last Tuesday
-```
-
-#### Extended Relative Dates
-
-```go
-settings := &godateparser.Settings{
-    Languages: []string{"es"},
-    RelativeBase: time.Date(2024, 10, 15, 0, 0, 0, 0, time.UTC),
-}
 
 // Period boundaries
-godateparser.ParseDate("inicio de mes", settings)          // October 1, 2024
-godateparser.ParseDate("fin de mes", settings)             // October 31, 2024
-godateparser.ParseDate("comienzo de año", settings)        // January 1, 2024
-godateparser.ParseDate("fin de año", settings)             // December 31, 2024
-
-// This/next/last
-godateparser.ParseDate("este lunes", settings)             // this Monday
-godateparser.ParseDate("esta semana", settings)            // this week (Monday)
-godateparser.ParseDate("próxima semana", settings)         // next week
-godateparser.ParseDate("último mes", settings)             // last month
-
-// Combined patterns
-godateparser.ParseDate("inicio de próximo mes", settings)  // November 1, 2024
-godateparser.ParseDate("fin de último año", settings)      // December 31, 2023
-```
-
-#### Incomplete Dates
-
-```go
-settings := &godateparser.Settings{
-    Languages: []string{"es"},
-    PreferDatesFrom: "future", // Prefer future dates
-    RelativeBase: time.Date(2024, 10, 15, 0, 0, 0, 0, time.UTC),
-}
-
-// Month only
-godateparser.ParseDate("mayo", settings)           // May 1, 2025 (future)
-godateparser.ParseDate("diciembre", settings)      // December 1, 2024 (this year)
-
-// Month and day (without year)
-godateparser.ParseDate("junio 15", settings)       // June 15, 2025
-godateparser.ParseDate("15 junio", settings)       // June 15, 2025
-godateparser.ParseDate("3 de junio", settings)     // June 3, 2025
-godateparser.ParseDate("25 diciembre", settings)   // December 25, 2024
-```
-
-#### Time Expressions
-
-```go
-settings := &godateparser.Settings{Languages: []string{"es"}}
-
-// Special times
-godateparser.ParseDate("mediodía", settings)       // 12:00 PM
-godateparser.ParseDate("medianoche", settings)     // 12:00 AM
-
-// Quarter/half past/to
-godateparser.ParseDate("3 y cuarto", settings)     // 3:15
-godateparser.ParseDate("9 y media", settings)      // 9:30
-godateparser.ParseDate("menos cuarto las 5", settings) // 4:45
-```
-
-### Portuguese Examples
-
-```go
-settings := &godateparser.Settings{
-    Languages: []string{"pt"},
-}
-
-// Months and weekdays
-godateparser.ParseDate("15 de junho de 2024", settings)  // June 15, 2024
-godateparser.ParseDate("25 dezembro 2024", settings)     // December 25, 2024
-godateparser.ParseDate("segunda-feira", settings)         // Next Monday
-godateparser.ParseDate("sexta", settings)                 // Next Friday
-
-// Simple relative dates
-godateparser.ParseDate("ontem", settings)      // Yesterday
-godateparser.ParseDate("hoje", settings)       // Today  
-godateparser.ParseDate("amanhã", settings)     // Tomorrow
-
-// Relative dates with time units
-godateparser.ParseDate("há 2 dias", settings)        // 2 days ago
-godateparser.ParseDate("há 1 semana", settings)      // 1 week ago
-godateparser.ParseDate("em 3 dias", settings)        // in 3 days
-godateparser.ParseDate("daqui a 2 semanas", settings) // in 2 weeks
-
-// Next/Last patterns
-godateparser.ParseDate("próxima segunda", settings)   // Next Monday
-godateparser.ParseDate("última sexta", settings)      // Last Friday
-godateparser.ParseDate("próximo mês", settings)       // Next month
-godateparser.ParseDate("último ano", settings)        // Last year
+godateparser.ParseDate("inicio de mes", settings)   // beginning of month
+godateparser.ParseDate("fin de año", settings)      // end of year
 
 // Time expressions
-godateparser.ParseDate("meio-dia", settings)      // 12:00
-godateparser.ParseDate("meia-noite", settings)    // 00:00
-godateparser.ParseDate("3 e meia", settings)      // 3:30
-
-// Works with or without accents
-godateparser.ParseDate("proximo mes", settings)   // Next month (no accent)
-godateparser.ParseDate("ultimo ano", settings)    // Last year (no accent)
-godateparser.ParseDate("ha 2 dias", settings)     // 2 days ago (no accent)
+godateparser.ParseDate("mediodía", settings)        // 12:00 PM
+godateparser.ParseDate("3 y media", settings)       // 3:30
 ```
 
-### French Examples
-
-```go
-settings := &godateparser.Settings{
-    Languages: []string{"fr"},
-}
-
-// Months and weekdays
-godateparser.ParseDate("31 décembre 2024", settings)  // December 31, 2024
-godateparser.ParseDate("15 juin 2024", settings)      // June 15, 2024
-godateparser.ParseDate("7 février 2025", settings)    // February 7, 2025
-godateparser.ParseDate("lundi", settings)             // Next Monday
-godateparser.ParseDate("vendredi", settings)          // Next Friday
-
-// Simple relative dates
-godateparser.ParseDate("hier", settings)          // Yesterday
-godateparser.ParseDate("aujourd'hui", settings)   // Today
-godateparser.ParseDate("demain", settings)        // Tomorrow
-
-// Relative dates with time units
-godateparser.ParseDate("il y a 2 jours", settings)    // 2 days ago
-godateparser.ParseDate("il y a 1 semaine", settings)  // 1 week ago
-godateparser.ParseDate("dans 3 jours", settings)      // in 3 days
-godateparser.ParseDate("dans 2 semaines", settings)   // in 2 weeks
-godateparser.ParseDate("en 1 mois", settings)         // in 1 month
-
-// Next/Last patterns
-godateparser.ParseDate("prochain lundi", settings)    // Next Monday
-godateparser.ParseDate("dernier vendredi", settings)  // Last Friday
-godateparser.ParseDate("prochaine semaine", settings) // Next week
-godateparser.ParseDate("prochain mois", settings)     // Next month
-godateparser.ParseDate("dernier mois", settings)      // Last month
-
-// Time expressions
-godateparser.ParseDate("midi", settings)      // 12:00
-godateparser.ParseDate("minuit", settings)    // 00:00
-godateparser.ParseDate("15h30", settings)     // 3:30 PM
-godateparser.ParseDate("15h", settings)       // 3:00 PM
-
-// Works with or without accents
-godateparser.ParseDate("decembre", settings)      // December (no accent)
-godateparser.ParseDate("fevrier", settings)       // February (no accent)
-godateparser.ParseDate("derniere semaine", settings)  // Last week (no accent)
-```
-
-### German Examples
-
-```go
-settings := &godateparser.Settings{
-    Languages: []string{"de"},
-}
-
-// Months and weekdays
-godateparser.ParseDate("31 Dezember 2024", settings)  // December 31, 2024
-godateparser.ParseDate("15 Juni 2024", settings)      // June 15, 2024
-godateparser.ParseDate("7 Februar 2025", settings)    // February 7, 2025
-godateparser.ParseDate("Montag", settings)            // Next Monday
-godateparser.ParseDate("Freitag", settings)           // Next Friday
-
-// Simple relative dates
-godateparser.ParseDate("gestern", settings)    // Yesterday
-godateparser.ParseDate("heute", settings)      // Today
-godateparser.ParseDate("morgen", settings)     // Tomorrow
-
-// Relative dates with time units
-godateparser.ParseDate("vor 2 Tagen", settings)        // 2 days ago
-godateparser.ParseDate("vor 1 Woche", settings)        // 1 week ago
-godateparser.ParseDate("in 3 Tagen", settings)         // in 3 days
-godateparser.ParseDate("in 2 Wochen", settings)        // in 2 weeks
-godateparser.ParseDate("in 1 Monat", settings)         // in 1 month
-
-// Next/Last patterns
-godateparser.ParseDate("nächster Montag", settings)    // Next Monday
-godateparser.ParseDate("letzter Freitag", settings)    // Last Friday
-godateparser.ParseDate("nächste Woche", settings)      // Next week
-godateparser.ParseDate("nächster Monat", settings)     // Next month
-godateparser.ParseDate("letzter Monat", settings)      // Last month
-godateparser.ParseDate("kommender Montag", settings)   // Coming Monday
-godateparser.ParseDate("vergangener Freitag", settings) // Past Friday
-
-// Time expressions
-godateparser.ParseDate("Mittag", settings)      // 12:00
-godateparser.ParseDate("Mitternacht", settings) // 00:00
-godateparser.ParseDate("15:30", settings)       // 3:30 PM
-
-// Works with or without umlauts
-godateparser.ParseDate("Marz", settings)           // März (March, no umlaut)
-godateparser.ParseDate("naechste Woche", settings) // nächste Woche (no umlaut)
-```
-
-### Chinese Simplified (zh) Examples
-
-```go
-settings := &godateparser.Settings{
-    Languages: []string{"zh"},
-}
-
-// Chinese weekdays - multiple forms
-godateparser.ParseDate("星期一", settings)   // Monday (formal: xīngqī)
-godateparser.ParseDate("周一", settings)     // Monday (common: zhōu)
-godateparser.ParseDate("礼拜一", settings)   // Monday (colloquial: lǐbài)
-godateparser.ParseDate("星期天", settings)   // Sunday alternative
-
-// Simple relative dates
-godateparser.ParseDate("昨天", settings)     // yesterday (zuótiān)
-godateparser.ParseDate("今天", settings)     // today (jīntiān)
-godateparser.ParseDate("明天", settings)     // tomorrow (míngtiān)
-
-// Chinese months
-godateparser.ParseDate("1月", settings)      // January
-godateparser.ParseDate("5月", settings)      // May
-godateparser.ParseDate("12月", settings)     // December
-
-// Time expressions
-godateparser.ParseDate("中午", settings)     // noon (zhōngwǔ)
-godateparser.ParseDate("午夜", settings)     // midnight (wǔyè)
-godateparser.ParseDate("15:30", settings)    // 3:30 PM
-
-// Mixed with English
-settings = &godateparser.Settings{
-    Languages: []string{"zh", "en"},
-}
-godateparser.ParseDate("星期一", settings)        // Chinese: Monday
-godateparser.ParseDate("Monday", settings)       // English: Monday
-godateparser.ParseDate("昨天", settings)          // Chinese: yesterday
-godateparser.ParseDate("yesterday", settings)    // English: yesterday
-```
-
-// Chinese date formats
-godateparser.ParseDate("2024年12月31日", settings)  // 2024-12-31
-godateparser.ParseDate("2025年1月1日", settings)    // 2025-01-01
-
-// Relative patterns with numbers
-godateparser.ParseDate("3天前", settings)           // 3 days ago
-godateparser.ParseDate("2周后", settings)           // in 2 weeks
-godateparser.ParseDate("1个月前", settings)         // 1 month ago
-
-// Next/Last patterns
-godateparser.ParseDate("下周", settings)             // next week
-godateparser.ParseDate("上月", settings)             // last month
-
-// Weekday modifiers - next/last week with specific weekday
-godateparser.ParseDate("下周一", settings)           // next week Monday (using 周)
-godateparser.ParseDate("上周五", settings)           // last week Friday (using 周)
-godateparser.ParseDate("下星期一", settings)         // next week Monday (using 星期)
-```
-
-### Japanese (ja) Examples
-
-```go
-settings := &godateparser.Settings{
-    Languages: []string{"ja"},
-}
-
-// Japanese weekdays - multiple forms
-godateparser.ParseDate("月曜日", settings)   // Monday (getsuyoubi - full)
-godateparser.ParseDate("月曜", settings)     // Monday (getsuyo - short)
-godateparser.ParseDate("火曜日", settings)   // Tuesday
-godateparser.ParseDate("水曜", settings)     // Wednesday (short)
-
-// Simple relative dates
-godateparser.ParseDate("昨日", settings)     // yesterday (kinou)
-godateparser.ParseDate("今日", settings)     // today (kyou)
-godateparser.ParseDate("明日", settings)     // tomorrow (ashita)
-
-// Japanese months
-godateparser.ParseDate("1月", settings)      // January (ichigatsu)
-godateparser.ParseDate("5月", settings)      // May (gogatsu)
-godateparser.ParseDate("12月", settings)     // December (juunigatsu)
-
-// Time expressions
-godateparser.ParseDate("正午", settings)     // noon (shougo)
-godateparser.ParseDate("真夜中", settings)   // midnight (mayonaka)
-godateparser.ParseDate("15:30", settings)    // 3:30 PM
-
-// Mixed with English
-settings = &godateparser.Settings{
-    Languages: []string{"ja", "en"},
-}
-godateparser.ParseDate("月曜日", settings)        // Japanese: Monday
-godateparser.ParseDate("Monday", settings)       // English: Monday
-godateparser.ParseDate("昨日", settings)          // Japanese: yesterday
-godateparser.ParseDate("yesterday", settings)    // English: yesterday
-```
-
-// Japanese date formats
-godateparser.ParseDate("2024年12月31日", settings)  // 2024-12-31 (same as Chinese!)
-godateparser.ParseDate("2025年1月1日", settings)    // 2025-01-01
-
-// Relative patterns with numbers
-godateparser.ParseDate("3日前", settings)           // 3 days ago (mikka mae)
-godateparser.ParseDate("2週後", settings)           // in 2 weeks (ni shuu go)
-godateparser.ParseDate("1ヶ月前", settings)         // 1 month ago
-
-// Next/Last patterns
-godateparser.ParseDate("来週", settings)             // next week (raishuu)
-godateparser.ParseDate("先週", settings)             // last week (senshuu)
-godateparser.ParseDate("来月", settings)             // next month (raigetsu)
-godateparser.ParseDate("先月", settings)             // last month (sengetsu)
-
-// Weekday modifiers - next/last week with specific weekday
-godateparser.ParseDate("来週月曜", settings)         // next week Monday (raishuu getsuyou)
-godateparser.ParseDate("先週金曜", settings)         // last week Friday (senshuu kinyou)
-godateparser.ParseDate("来週月曜日", settings)       // next week Monday (with 日 suffix)
-
-#### Mixed Language Usage
-
-```go
-// Enable both languages for maximum flexibility
-settings := &godateparser.Settings{
-    Languages: []string{"es", "en"},
-}
-
-// Both languages work
-godateparser.ParseDate("31 diciembre 2024", settings)  // Spanish
-godateparser.ParseDate("December 31, 2024", settings)  // English
-
-// Can even mix within same application
-godateparser.ParseDate("próximo lunes", settings)      // Spanish: next Monday
-godateparser.ParseDate("next Friday", settings)        // English: next Friday
-
-// Enable all seven languages
-settings = &godateparser.Settings{
-    Languages: []string{"ja", "zh", "de", "fr", "pt", "es", "en"},
-}
-godateparser.ParseDate("明日", settings)               // Japanese: tomorrow
-godateparser.ParseDate("明天", settings)               // Chinese: tomorrow
-godateparser.ParseDate("morgen", settings)            // German: tomorrow
-godateparser.ParseDate("demain", settings)            // French: tomorrow
-godateparser.ParseDate("amanhã", settings)            // Portuguese: tomorrow
-godateparser.ParseDate("mañana", settings)            // Spanish: tomorrow  
-godateparser.ParseDate("tomorrow", settings)          // English: tomorrow
-```
+**📚 For comprehensive examples in all 10 languages, see [LANGUAGE_EXAMPLES.md](LANGUAGE_EXAMPLES.md)**
 
 ## Contributing
 
@@ -830,7 +479,7 @@ Contributions are welcome! Please feel free to submit issues, feature requests, 
 
 ### Adding New Languages
 
-Interested in adding support for Italian, Dutch, Korean, or Russian? Check out the `translations/` package for the translation infrastructure. Use the Spanish, Portuguese, French, German, Chinese, or Japanese implementations as a reference.
+Interested in adding support for Korean, Arabic, Polish, or other languages? Check out the `translations/` package for the translation infrastructure. Use the existing language implementations (Spanish, Portuguese, French, German, Italian, Dutch, Russian, Chinese, or Japanese) as a reference.
 
 ## License
 

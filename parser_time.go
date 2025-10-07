@@ -327,6 +327,31 @@ func tryParseMultiLangTime(ctx *parserContext, input string) (time.Time, error) 
 		if result, err := tryParseFrenchHeures(ctx, input, lang); err == nil {
 			return result, nil
 		}
+
+		// Try "kwart over 3" patterns - Dutch "quarter past"
+		if result, err := tryParseDutchKwartOver(ctx, input, lang); err == nil {
+			return result, nil
+		}
+
+		// Try "half 4" patterns - Dutch "half past" (special: means 3:30, not 4:30)
+		if result, err := tryParseDutchHalf(ctx, input, lang); err == nil {
+			return result, nil
+		}
+
+		// Try "3 e un quarto" patterns - Italian "quarter past"
+		if result, err := tryParseItalianQuarto(ctx, input, lang); err == nil {
+			return result, nil
+		}
+
+		// Try "meno un quarto le 3" patterns - Italian "quarter to"
+		if result, err := tryParseItalianMenoQuarto(ctx, input, lang); err == nil {
+			return result, nil
+		}
+
+		// Try "3 часа дня" patterns - Russian "3 hours of day/night"
+		if result, err := tryParseRussianHoursAMPM(ctx, input, lang); err == nil {
+			return result, nil
+		}
 	}
 
 	return time.Time{}, fmt.Errorf("no multi-language time pattern matched")
@@ -578,6 +603,261 @@ func tryParseQuarterTo(ctx *parserContext, input string, lang *translations.Lang
 
 				base := ctx.settings.RelativeBase
 				return time.Date(base.Year(), base.Month(), base.Day(), hour, minute, 0, 0, base.Location()), nil
+			}
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("no match")
+}
+
+// tryParseDutchKwartOver parses Dutch "kwart over 3" (quarter past 3)
+func tryParseDutchKwartOver(ctx *parserContext, input string, lang *translations.Language) (time.Time, error) {
+	if lang.TimeTerms == nil {
+		return time.Time{}, fmt.Errorf("no time terms")
+	}
+
+	// Try with each "quarter" term and "past" term
+	for _, quarterTerm := range lang.TimeTerms.Quarter {
+		if quarterTerm == "" {
+			continue
+		}
+		for _, pastTerm := range lang.TimeTerms.Past {
+			if pastTerm == "" {
+				continue
+			}
+
+			// Pattern: "kwart over 3" - quarter + past + hour
+			pattern := fmt.Sprintf(`^%s\s+%s\s+(\d{1,2})$`,
+				regexp.QuoteMeta(strings.ToLower(quarterTerm)),
+				regexp.QuoteMeta(strings.ToLower(pastTerm)))
+			re := regexp.MustCompile(pattern)
+
+			if matches := re.FindStringSubmatch(input); matches != nil {
+				hour, _ := strconv.Atoi(matches[1])
+				minute := 15
+
+				if hour > 23 {
+					return time.Time{}, &ErrInvalidDate{
+						Year:   0,
+						Month:  0,
+						Day:    0,
+						Reason: fmt.Sprintf("hour %d out of range (0-23)", hour),
+					}
+				}
+
+				base := ctx.settings.RelativeBase
+				return time.Date(base.Year(), base.Month(), base.Day(), hour, minute, 0, 0, base.Location()), nil
+			}
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("no match")
+}
+
+// tryParseDutchHalf parses Dutch "half 4" (means 3:30, not 4:30!)
+func tryParseDutchHalf(ctx *parserContext, input string, lang *translations.Language) (time.Time, error) {
+	if lang.TimeTerms == nil {
+		return time.Time{}, fmt.Errorf("no time terms")
+	}
+
+	// Try with each "half" term
+	for _, halfTerm := range lang.TimeTerms.Half {
+		if halfTerm == "" {
+			continue
+		}
+
+		// Pattern: "half 4" - half + hour
+		pattern := fmt.Sprintf(`^%s\s+(\d{1,2})$`,
+			regexp.QuoteMeta(strings.ToLower(halfTerm)))
+		re := regexp.MustCompile(pattern)
+
+		if matches := re.FindStringSubmatch(input); matches != nil {
+			hour, _ := strconv.Atoi(matches[1])
+			// Dutch "half 4" means "half to 4" = 3:30
+			hour--
+			minute := 30
+
+			if hour < 0 {
+				hour = 23
+			}
+
+			if hour > 23 {
+				return time.Time{}, &ErrInvalidDate{
+					Year:   0,
+					Month:  0,
+					Day:    0,
+					Reason: fmt.Sprintf("hour %d out of range (0-23)", hour),
+				}
+			}
+
+			base := ctx.settings.RelativeBase
+			return time.Date(base.Year(), base.Month(), base.Day(), hour, minute, 0, 0, base.Location()), nil
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("no match")
+}
+
+// tryParseItalianQuarto parses Italian "3 e un quarto" (3 and a quarter = 3:15)
+func tryParseItalianQuarto(ctx *parserContext, input string, lang *translations.Language) (time.Time, error) {
+	if lang.TimeTerms == nil {
+		return time.Time{}, fmt.Errorf("no time terms")
+	}
+
+	// Try with each "quarter" term
+	for _, quarterTerm := range lang.TimeTerms.Quarter {
+		if quarterTerm == "" {
+			continue
+		}
+
+		// Pattern: "3 e un quarto" - hour + e + un + quarter
+		pattern := fmt.Sprintf(`^(\d{1,2})\s+e\s+un\s+%s$`,
+			regexp.QuoteMeta(strings.ToLower(quarterTerm)))
+		re := regexp.MustCompile(pattern)
+
+		if matches := re.FindStringSubmatch(input); matches != nil {
+			hour, _ := strconv.Atoi(matches[1])
+			minute := 15
+
+			if hour > 23 {
+				return time.Time{}, &ErrInvalidDate{
+					Year:   0,
+					Month:  0,
+					Day:    0,
+					Reason: fmt.Sprintf("hour %d out of range (0-23)", hour),
+				}
+			}
+
+			base := ctx.settings.RelativeBase
+			return time.Date(base.Year(), base.Month(), base.Day(), hour, minute, 0, 0, base.Location()), nil
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("no match")
+}
+
+// tryParseItalianMenoQuarto parses Italian "meno un quarto le 3" (less a quarter to 3 = 2:45)
+func tryParseItalianMenoQuarto(ctx *parserContext, input string, lang *translations.Language) (time.Time, error) {
+	if lang.TimeTerms == nil {
+		return time.Time{}, fmt.Errorf("no time terms")
+	}
+
+	// Try with each "quarter" term
+	for _, quarterTerm := range lang.TimeTerms.Quarter {
+		if quarterTerm == "" {
+			continue
+		}
+
+		// Pattern: "meno un quarto le 3" - meno + un + quarter + le + hour
+		pattern := fmt.Sprintf(`^meno\s+un\s+%s\s+le\s+(\d{1,2})$`,
+			regexp.QuoteMeta(strings.ToLower(quarterTerm)))
+		re := regexp.MustCompile(pattern)
+
+		if matches := re.FindStringSubmatch(input); matches != nil {
+			hour, _ := strconv.Atoi(matches[1])
+			minute := 45
+			hour-- // Go back one hour
+
+			if hour < 0 {
+				hour = 23
+			}
+
+			if hour > 23 {
+				return time.Time{}, &ErrInvalidDate{
+					Year:   0,
+					Month:  0,
+					Day:    0,
+					Reason: fmt.Sprintf("hour %d out of range (0-23)", hour),
+				}
+			}
+
+			base := ctx.settings.RelativeBase
+			return time.Date(base.Year(), base.Month(), base.Day(), hour, minute, 0, 0, base.Location()), nil
+		}
+	}
+
+	return time.Time{}, fmt.Errorf("no match")
+}
+
+// tryParseRussianHoursAMPM parses Russian "3 часа дня" (3 hours of day = 3 PM)
+func tryParseRussianHoursAMPM(ctx *parserContext, input string, lang *translations.Language) (time.Time, error) {
+	if lang.TimeTerms == nil {
+		return time.Time{}, fmt.Errorf("no time terms")
+	}
+
+	// Try with each "o'clock" term (часов, час, часа)
+	for _, oclockTerm := range lang.TimeTerms.OClock {
+		if oclockTerm == "" {
+			continue
+		}
+
+		// Try with AM terms (утра, ночи)
+		for _, amTerm := range lang.TimeTerms.AM {
+			if amTerm == "" {
+				continue
+			}
+
+			// Pattern: "3 часа утра" or "9 часов утра"
+			pattern := fmt.Sprintf(`^(\d{1,2})\s+%s\s+%s$`,
+				regexp.QuoteMeta(strings.ToLower(oclockTerm)),
+				regexp.QuoteMeta(strings.ToLower(amTerm)))
+			re := regexp.MustCompile(pattern)
+
+			if matches := re.FindStringSubmatch(input); matches != nil {
+				hour, _ := strconv.Atoi(matches[1])
+
+				// "ночи" (night) is for 12 AM - 5 AM, "утра" (morning) is for 6 AM - 11 AM
+				// If hour is 12 with "ночи", it means midnight (0:00)
+				if amTerm == "ночи" && hour == 12 {
+					hour = 0
+				}
+
+				if hour > 23 {
+					return time.Time{}, &ErrInvalidDate{
+						Year:   0,
+						Month:  0,
+						Day:    0,
+						Reason: fmt.Sprintf("hour %d out of range (0-23)", hour),
+					}
+				}
+
+				base := ctx.settings.RelativeBase
+				return time.Date(base.Year(), base.Month(), base.Day(), hour, 0, 0, 0, base.Location()), nil
+			}
+		}
+
+		// Try with PM terms (дня, вечера)
+		for _, pmTerm := range lang.TimeTerms.PM {
+			if pmTerm == "" {
+				continue
+			}
+
+			// Pattern: "3 часа дня" or "7 часов вечера"
+			pattern := fmt.Sprintf(`^(\d{1,2})\s+%s\s+%s$`,
+				regexp.QuoteMeta(strings.ToLower(oclockTerm)),
+				regexp.QuoteMeta(strings.ToLower(pmTerm)))
+			re := regexp.MustCompile(pattern)
+
+			if matches := re.FindStringSubmatch(input); matches != nil {
+				hour, _ := strconv.Atoi(matches[1])
+
+				// "дня" (day) is for 12 PM - 5 PM, "вечера" (evening) is for 6 PM - 11 PM
+				// If hour is less than 12, add 12 for PM
+				if hour < 12 {
+					hour += 12
+				}
+
+				if hour > 23 {
+					return time.Time{}, &ErrInvalidDate{
+						Year:   0,
+						Month:  0,
+						Day:    0,
+						Reason: fmt.Sprintf("hour %d out of range (0-23)", hour),
+					}
+				}
+
+				base := ctx.settings.RelativeBase
+				return time.Date(base.Year(), base.Month(), base.Day(), hour, 0, 0, 0, base.Location()), nil
 			}
 		}
 	}

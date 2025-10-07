@@ -1,13 +1,15 @@
-package godateparser
+package translations_test
 
 import (
 	"testing"
 	"time"
+
+	"github.com/coredds/godateparser"
 )
 
 func TestFrench_Months(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
 		Languages:    []string{"fr", "en"},
 	}
@@ -35,9 +37,9 @@ func TestFrench_Months(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Year() != tt.wantYear {
@@ -55,7 +57,7 @@ func TestFrench_Months(t *testing.T) {
 
 func TestFrench_Weekdays(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC) // Saturday
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
 		Languages:    []string{"fr", "en"},
 	}
@@ -84,9 +86,9 @@ func TestFrench_Weekdays(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Weekday() != tt.wantWeekday {
@@ -98,7 +100,7 @@ func TestFrench_Weekdays(t *testing.T) {
 
 func TestFrench_RelativeSimple(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
 		Languages:    []string{"fr", "en"},
 	}
@@ -116,9 +118,9 @@ func TestFrench_RelativeSimple(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Year() != tt.wantYear {
@@ -133,7 +135,7 @@ func TestFrench_RelativeSimple(t *testing.T) {
 
 func TestFrench_RelativeAgo(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
 		Languages:    []string{"fr", "en"},
 	}
@@ -152,9 +154,9 @@ func TestFrench_RelativeAgo(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Year() != tt.wantYear {
@@ -169,7 +171,7 @@ func TestFrench_RelativeAgo(t *testing.T) {
 
 func TestFrench_RelativeIn(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
 		Languages:    []string{"fr", "en"},
 	}
@@ -190,9 +192,9 @@ func TestFrench_RelativeIn(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Year() != tt.wantYear {
@@ -207,7 +209,7 @@ func TestFrench_RelativeIn(t *testing.T) {
 
 func TestFrench_RelativeNextLast(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
 		Languages:    []string{"fr", "en"},
 	}
@@ -229,9 +231,9 @@ func TestFrench_RelativeNextLast(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Year() != tt.wantYear {
@@ -249,7 +251,7 @@ func TestFrench_RelativeNextLast(t *testing.T) {
 
 func TestFrench_WeekdaysWithModifiers(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC) // Saturday
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
 		Languages:    []string{"fr", "en"},
 	}
@@ -270,9 +272,9 @@ func TestFrench_WeekdaysWithModifiers(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Weekday() != tt.wantWeekday {
@@ -287,7 +289,7 @@ func TestFrench_WeekdaysWithModifiers(t *testing.T) {
 
 func TestFrench_TimeExpressions(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
 		Languages:    []string{"fr", "en"},
 	}
@@ -307,9 +309,9 @@ func TestFrench_TimeExpressions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Hour() != tt.wantHour {
@@ -324,7 +326,7 @@ func TestFrench_TimeExpressions(t *testing.T) {
 
 func TestFrench_IncompleteDates(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
 		Languages:    []string{"fr", "en"},
 	}
@@ -347,9 +349,9 @@ func TestFrench_IncompleteDates(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Year() != tt.wantYear {
@@ -367,7 +369,7 @@ func TestFrench_IncompleteDates(t *testing.T) {
 
 func TestFrench_OrdinalDates(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
 		Languages:    []string{"fr", "en"},
 	}
@@ -392,9 +394,9 @@ func TestFrench_OrdinalDates(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Year() != tt.wantYear {
@@ -412,7 +414,7 @@ func TestFrench_OrdinalDates(t *testing.T) {
 
 func TestFrench_ThisNextLast(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC) // Saturday
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
 		Languages:    []string{"fr", "en"},
 	}
@@ -429,9 +431,9 @@ func TestFrench_ThisNextLast(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Weekday() != tt.wantWeekday {
@@ -443,14 +445,14 @@ func TestFrench_ThisNextLast(t *testing.T) {
 
 func TestFrench_ThisWeek(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC) // Saturday
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
 		Languages:    []string{"fr", "en"},
 	}
 
-	result, err := ParseDate("cette semaine", settings)
+	result, err := godateparser.ParseDate("cette semaine", settings)
 	if err != nil {
-		t.Errorf("ParseDate() error = %v", err)
+		t.Errorf("godateparser.ParseDate() error = %v", err)
 		return
 	}
 
@@ -466,7 +468,7 @@ func TestFrench_ThisWeek(t *testing.T) {
 
 func TestFrench_FrenchSpecific(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
 		Languages:    []string{"fr", "en"},
 		DateOrder:    "DMY",
@@ -486,9 +488,9 @@ func TestFrench_FrenchSpecific(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Year() != tt.wantYear {
@@ -506,7 +508,7 @@ func TestFrench_FrenchSpecific(t *testing.T) {
 
 func TestFrench_MixedWithEnglish(t *testing.T) {
 	refTime := time.Date(2024, time.June, 15, 12, 0, 0, 0, time.UTC)
-	settings := &Settings{
+	settings := &godateparser.Settings{
 		RelativeBase: refTime,
 		Languages:    []string{"fr", "en"},
 	}
@@ -526,9 +528,9 @@ func TestFrench_MixedWithEnglish(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result, err := ParseDate(tt.input, settings)
+			result, err := godateparser.ParseDate(tt.input, settings)
 			if err != nil {
-				t.Errorf("ParseDate() error = %v", err)
+				t.Errorf("godateparser.ParseDate() error = %v", err)
 				return
 			}
 			if result.Year() != tt.wantYear {

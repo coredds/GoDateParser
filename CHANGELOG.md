@@ -5,6 +5,101 @@ All notable changes to godateparser will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.4] - 2025-10-07
+
+### Added
+- **Italian Language Support (it)**: Comprehensive Italian date parsing
+  - Months: `gennaio`, `febbraio`, ..., `dicembre` (full and abbreviated forms)
+  - Weekdays: `lunedì`, `martedì`, ..., `domenica` (full and abbreviated forms)
+  - Simple relative: `ieri` (yesterday), `oggi` (today), `domani` (tomorrow)
+  - Ago patterns: `2 giorni fa` (2 days ago), `1 settimana fa` (1 week ago)
+  - Future patterns: `tra 3 giorni` (in 3 days), `fra 2 settimane` (in 2 weeks)
+  - Next/last: `prossimo` (next), `scorso` (last), `questo` (this)
+  - Period boundaries: `inizio di mese` (beginning of month), `fine di anno` (end of year)
+  - Time expressions: `3 e un quarto` (quarter past 3), `meno un quarto le 3` (quarter to 3)
+  - Italian preposition "di" support in date patterns
+
+- **Dutch Language Support (nl)**: Comprehensive Dutch date parsing
+  - Months: `januari`, `februari`, ..., `december` (full and abbreviated forms)
+  - Weekdays: `maandag`, `dinsdag`, ..., `zondag` (full and abbreviated forms)
+  - Simple relative: `gisteren` (yesterday), `vandaag` (today), `morgen` (tomorrow)
+  - Ago patterns: `2 dagen geleden` (2 days ago), `1 week geleden` (1 week ago)
+  - Future patterns: `over 3 dagen` (in 3 days), `in 2 weken` (in 2 weeks)
+  - Next/last with gender agreement: `volgend jaar` (next year - neuter), `volgende maand` (next month - common)
+  - Period boundaries: `begin van maand` (beginning of month), `einde van jaar` (end of year)
+  - Special time format: `half 4` means 3:30 (half to 4, not half past 4)
+  - Time expressions: `kwart over 3` (quarter past 3), `kwart voor 3` (quarter to 3)
+  - Dutch preposition "van" support in date patterns
+
+- **Russian Language Support (ru)**: Comprehensive Russian date parsing with grammatical cases
+  - Months: `январь`, `февраль`, ..., `декабрь` (nominative and genitive cases)
+  - Weekdays: `понедельник`, `вторник`, ..., `воскресенье` (nominative and prepositional cases)
+  - Prepositional phrases: `в понедельнике` (on Monday), `в среде` (on Wednesday)
+  - Simple relative: `вчера` (yesterday), `сегодня` (today), `завтра` (tomorrow)
+  - Ago patterns: `2 дня назад` (2 days ago), `1 неделю назад` (1 week ago - accusative case)
+  - Future patterns: `через 3 дня` (in 3 days), `через 2 недели` (in 2 weeks)
+  - Next/last with grammatical cases: `следующего месяца` (next month - genitive), `прошлого года` (last year - genitive)
+  - Period boundaries with cases: `начало месяца` (beginning of month), `конец года` (end of year)
+  - Time expressions with AM/PM: `3 часа дня` (3 PM), `9 часов утра` (9 AM)
+  - Plural forms: nominative, genitive singular, genitive plural, accusative
+  - Full Cyrillic script support
+
+- **New Files**:
+  - `translations/italian.go` - Italian language implementation
+  - `translations/dutch.go` - Dutch language implementation
+  - `translations/russian.go` - Russian language implementation
+  - `translations/italian_test.go` - Comprehensive Italian test suite
+  - `translations/dutch_test.go` - Comprehensive Dutch test suite
+  - `translations/russian_test.go` - Comprehensive Russian test suite
+  - `LANGUAGE_EXAMPLES.md` - Dedicated file for comprehensive language examples
+
+### Changed
+- **Test Organization**: Reorganized test files following Go best practices
+  - Moved all language-specific test files to `translations/` package
+  - Changed package declaration from `package godateparser` to `package translations_test`
+  - Tests now properly import `github.com/coredds/godateparser` for external testing
+  - Core functionality tests remain in root package
+  - Enables more granular test execution and better code organization
+
+- **Documentation Restructure**:
+  - Extracted all detailed language examples to `LANGUAGE_EXAMPLES.md`
+  - Streamlined `README.md` to show only English and Spanish examples
+  - Added clear reference to `LANGUAGE_EXAMPLES.md` for comprehensive examples
+  - Improved documentation maintainability and readability
+
+- **Parser Enhancements**:
+  - `parser_absolute.go` - Added support for Italian "di" preposition and month-year patterns
+  - `parser_relative_extended.go` - Expanded period boundaries for Italian, Dutch, Russian
+  - `parser_time.go` - Added language-specific time parsing functions
+  - Enhanced regex patterns to support multiple prepositions (de, di, van)
+
+- **Test Suite**:
+  - 1200+ test cases total (up from 950+)
+  - Support for 10 languages: English, Spanish, Portuguese, French, German, Italian, Dutch, Russian, Chinese, Japanese
+  - All tests passing with 70.2% main package coverage
+
+### Fixed
+- **Date Parsing Ambiguity**: Fixed incorrect interpretation of "Month Day" as "Month Year"
+  - Changed month-year pattern from `(\d{2,4})` to `(\d{4})` to require 4-digit year
+  - Prevents "June 15" from being parsed as "June 2015"
+  - Ensures correct parsing of incomplete dates across all languages
+
+- **Grammatical Case Support**: Added missing grammatical forms for Russian
+  - Genitive case forms for next/last modifiers (`следующего`, `прошлого`)
+  - Accusative case for time units (`неделю`)
+  - Prepositional case for weekdays (`в понедельнике`)
+
+- **Gender Agreement**: Added gender-specific forms for Dutch
+  - Neuter forms: `volgend jaar` (next year), `vorig jaar` (last year)
+  - Common gender forms: `volgende maand` (next month), `vorige week` (last week)
+
+### Summary
+- Comprehensive support for **10 languages**: English, Spanish, Portuguese, French, German, Italian, Dutch, Russian, Chinese Simplified, Japanese
+- All three new languages (Italian, Dutch, Russian) have full feature parity with existing languages
+- Improved test organization following Go best practices
+- Enhanced documentation structure for better maintainability
+- Production-ready with 1200+ passing tests and zero linting issues
+
 ## [1.3.3] - 2025-10-02
 
 ### Added

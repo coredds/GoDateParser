@@ -12,7 +12,7 @@ A powerful Go library for parsing human-readable date strings in multiple format
 
 ## Features
 
-godateparser v1.3.1 supports **English**, **Spanish**, **Portuguese (Brazil)**, **French (France)**, **German (Germany)**, **Italian (Italy)**, **Dutch (Netherlands)**, **Russian (Russia)**, **Chinese Simplified (China)**, and **Japanese (Japan)** with comprehensive date parsing capabilities.
+godateparser v1.3.4 supports **English**, **Spanish**, **Portuguese (Brazil)**, **French (France)**, **German (Germany)**, **Italian (Italy)**, **Dutch (Netherlands)**, **Russian (Russia)**, **Chinese Simplified (China)**, and **Japanese (Japan)** with comprehensive date parsing capabilities.
 
 ### Core Parsing
 - **Absolute Dates**: ISO 8601, numeric formats (MDY/DMY/YMD), month names, two-digit years
